@@ -1,0 +1,141 @@
+<!-- ═══════════════════════════════════════════════════════
+     AUTH SCREENS: Login, OTP, FBO Login, FBO OTP
+     ═══════════════════════════════════════════════════════ -->
+
+<!-- Login Screen (returning users) -->
+<div class="screen" id="login-screen">
+  <div class="nav-row">
+    <button class="back-btn" onclick="showScreen('home-screen')">← Back</button>
+    <div class="nav-row-title">Login to FoSCoS</div>
+    <div></div>
+  </div>
+  <div class="center-wrap">
+    <div class="card" style="padding:32px">
+      <h2 style="font-size:24px;color:var(--navy);margin-bottom:6px">Welcome back 👋</h2>
+      <p style="color:var(--gray);font-size:14px;margin-bottom:24px">Select your role to continue</p>
+
+      <!-- Step 1: Role selection -->
+      <div id="login-role-step">
+        <div class="sel-card" style="margin-bottom:12px" onclick="selectLoginRole('fbo',this)">
+          <div class="sel-check">✓</div>
+          <div style="display:flex;align-items:center;gap:14px">
+            <span style="font-size:28px">👨‍🍳</span>
+            <div>
+              <div style="font-size:15px;font-weight:700;color:var(--navy)">FBO — Food Business Owner</div>
+              <div style="font-size:13px;color:var(--gray)">Manage your license &amp; applications</div>
+            </div>
+          </div>
+        </div>
+        <div class="sel-card" style="margin-bottom:12px" onclick="selectLoginRole('consumer',this)">
+          <div class="sel-check">✓</div>
+          <div style="display:flex;align-items:center;gap:14px">
+            <span style="font-size:28px">👤</span>
+            <div>
+              <div style="font-size:15px;font-weight:700;color:var(--navy)">Consumer</div>
+              <div style="font-size:13px;color:var(--gray)">Check FBOs, file complaints, track status</div>
+            </div>
+          </div>
+        </div>
+        <div class="sel-card" onclick="selectLoginRole('agent',this)">
+          <div class="sel-check">✓</div>
+          <div style="display:flex;align-items:center;gap:14px">
+            <span style="font-size:28px">🤝</span>
+            <div>
+              <div style="font-size:15px;font-weight:700;color:var(--navy)">Agent / Facilitator</div>
+              <div style="font-size:13px;color:var(--gray)">Manage applications for multiple clients</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Mobile input (shown after role selected) -->
+      <div id="login-mobile-step" style="display:none;margin-top:20px;border-top:1px solid var(--border);padding-top:20px">
+        <div class="form-row">
+          <label class="field-label">Mobile Number <span class="req">*</span></label>
+          <div style="display:flex;gap:8px">
+            <div style="padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;color:var(--gray);white-space:nowrap">+91</div>
+            <input class="field-input" type="tel" id="login-mobile" maxlength="10" placeholder="10-digit mobile number"/>
+          </div>
+        </div>
+        <button class="btn-primary" style="width:100%" onclick="sendLoginOTP()">Send OTP →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OTP Screen (generic login) -->
+<div class="screen" id="otp-screen">
+  <div class="nav-row">
+    <button class="back-btn" onclick="showScreen('login-screen')">← Back</button>
+    <div class="nav-row-title">Verify OTP</div>
+    <div></div>
+  </div>
+  <div class="center-wrap">
+    <div class="card" style="padding:32px;text-align:center">
+      <div style="font-size:40px;margin-bottom:12px">📱</div>
+      <h2 style="font-size:22px;color:var(--navy);margin-bottom:8px">Enter OTP</h2>
+      <p style="color:var(--gray);font-size:14px;margin-bottom:4px">Sent to +91 <span id="login-otp-mobile-display"></span></p>
+      <p style="font-size:12px;color:var(--gray);margin-bottom:24px">Enter the <span id="login-otp-length-label">5</span>-digit code</p>
+      <div class="otp-row" id="login-otp-row"></div>
+      <div id="login-otp-error" style="color:var(--red);font-size:13px;margin-bottom:12px;display:none">❌ Invalid OTP. Please try again.</div>
+      <button class="btn-primary" style="width:100%" onclick="verifyLoginOTP()">Verify &amp; Continue →</button>
+      <p style="margin-top:16px;font-size:13px;color:var(--gray)">Didn't receive it? <a href="#" onclick="sendLoginOTP();return false" style="color:var(--navy);font-weight:600">Resend OTP</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- FBO Login Screen -->
+<div class="screen" id="fbo-login-screen">
+  <div class="nav-row">
+    <button class="back-btn" onclick="showScreen('home-screen')">← Back</button>
+    <div class="nav-row-title">FBO Login</div>
+    <div></div>
+  </div>
+  <div class="center-wrap">
+    <div class="card" style="padding:36px;text-align:center">
+      <div style="font-size:40px;margin-bottom:12px">🏛️</div>
+      <h2 style="font-size:24px;color:var(--navy);margin-bottom:8px">Welcome back to FoSCoS</h2>
+      <p style="font-size:14px;color:var(--gray);margin-bottom:28px">New to FoSCoS? Start your fresh application right now.</p>
+      <div style="text-align:left">
+        <div class="form-row">
+          <label class="field-label">Mobile Number <span class="req">*</span></label>
+          <div style="display:flex;gap:8px">
+            <div style="padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;color:var(--gray);white-space:nowrap">+91</div>
+            <input class="field-input" type="tel" id="fbo-login-mobile" maxlength="10" placeholder="10-digit mobile number"/>
+          </div>
+        </div>
+        <button class="btn-primary" style="width:100%" onclick="goToFBOOTP()">Send OTP →</button>
+        <div style="text-align:center;margin-top:16px">
+          <a href="#" onclick="startFBOFlow();return false" style="font-size:13px;color:var(--navy);font-weight:600">New user? Start fresh application →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FBO OTP Screen -->
+<div class="screen" id="fbo-otp-screen">
+  <div class="nav-row">
+    <button class="back-btn" onclick="showScreen('fbo-login-screen')">← Back</button>
+    <div class="nav-row-title">Verify OTP</div>
+    <div></div>
+  </div>
+  <div class="center-wrap">
+    <div class="card" style="padding:36px;text-align:center">
+      <div style="font-size:40px;margin-bottom:12px">📱</div>
+      <h2 style="font-size:22px;color:var(--navy);margin-bottom:8px">Enter OTP</h2>
+      <p style="color:var(--gray);font-size:14px;margin-bottom:4px">Sent to +91 <span id="fbo-otp-mobile-display"></span></p>
+      <p style="font-size:12px;color:var(--gray);margin-bottom:24px">Enter the 5-digit code</p>
+      <div class="otp-row">
+        <input class="otp-box" type="tel" maxlength="1" id="fo1" oninput="otpAdvance(this,'fo2')" onkeydown="otpBack(event,this,null)"/>
+        <input class="otp-box" type="tel" maxlength="1" id="fo2" oninput="otpAdvance(this,'fo3')" onkeydown="otpBack(event,this,'fo1')"/>
+        <input class="otp-box" type="tel" maxlength="1" id="fo3" oninput="otpAdvance(this,'fo4')" onkeydown="otpBack(event,this,'fo2')"/>
+        <input class="otp-box" type="tel" maxlength="1" id="fo4" oninput="otpAdvance(this,'fo5')" onkeydown="otpBack(event,this,'fo3')"/>
+        <input class="otp-box" type="tel" maxlength="1" id="fo5" oninput="otpAdvance(this,null)" onkeydown="otpBack(event,this,'fo4')"/>
+      </div>
+      <div id="fbo-otp-status" style="margin:8px 0;font-size:13px;min-height:20px"></div>
+      <button class="btn-primary" style="width:100%" onclick="verifyFBOOTP()">Verify &amp; Continue →</button>
+      <p style="margin-top:16px;font-size:13px;color:var(--gray)">Didn't receive it? <a href="#" onclick="goToFBOOTP();return false" style="color:var(--navy);font-weight:600">Resend OTP</a></p>
+    </div>
+  </div>
+</div>

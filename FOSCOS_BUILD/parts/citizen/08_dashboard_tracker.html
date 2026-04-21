@@ -1,0 +1,298 @@
+<!-- ═══════════════════════════════════════════════════════
+     DASHBOARD, TRACKER, ANNUAL RETURN, MY-TL
+     ═══════════════════════════════════════════════════════ -->
+
+<!-- FBO Dashboard -->
+<div class="screen" id="dashboard-screen">
+  <div style="background:#fff;border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between">
+    <div>
+      <div style="font-size:22px;font-weight:700;color:var(--navy)" id="dash-greeting">Good morning, Friend! 🍽️</div>
+      <div style="font-size:13px;color:var(--gray)" id="dash-subtitle">Your Dashboard</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font-size:13px;color:var(--gray)" data-time></div>
+      <button class="back-btn" onclick="showScreen('home-screen')">🏠 Home</button>
+    </div>
+  </div>
+  <div class="page-wrap" style="padding-top:24px">
+    <!-- State A: Active License -->
+    <div id="dash-state-a">
+      <div class="two-col" style="grid-template-columns:1fr 360px">
+        <!-- Left -->
+        <div>
+          <div class="dash-license-card">
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.6);margin-bottom:6px" id="dash-lic-type">FSSAI State License</div>
+            <div style="font-size:24px;font-weight:700;color:#fff;margin-bottom:4px" id="dash-biz-name">Annapurna Catering</div>
+            <div style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:16px" id="dash-biz-type">Proprietorship · Restaurant &amp; Catering</div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+              <span style="background:rgba(107,143,113,.3);border:1px solid var(--sage);color:#a8d5b0;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700">● ACTIVE</span>
+            </div>
+            <div style="font-size:13px;color:rgba(255,255,255,.6);margin-bottom:4px">License Number</div>
+            <div class="license-number" style="color:#fff;font-size:15px;margin-bottom:12px" id="dash-lic-num">2026 0303 1083 8642 3</div>
+            <div style="font-size:13px" id="dash-expiry"><span class="expiry-ok">✅ Expires in 127 days</span></div>
+          </div>
+          <!-- Action Grid -->
+          <div class="dash-action-grid">
+            <div class="dash-action-btn" onclick="showScreen('tracker-screen')"><div class="da-icon">📊</div><div class="da-label">Track Application</div></div>
+            <div class="dash-action-btn" onclick="startFBOFlow()"><div class="da-icon">🔄</div><div class="da-label">Renew Now</div></div>
+            <div class="dash-action-btn" onclick="alert('Modification request flow — coming soon')"><div class="da-icon">✏️</div><div class="da-label">Modify License</div></div>
+            <div class="dash-action-btn" onclick="showScreen('annual-return-screen')"><div class="da-icon">📝</div><div class="da-label">File Annual Return</div></div>
+          </div>
+          <div class="dash-action-btn" style="text-align:center;background:var(--sageLt);border-color:var(--sage);margin-bottom:16px" onclick="openOneStopShop()">
+            <div style="font-size:22px;margin-bottom:6px">🛒</div>
+            <div style="font-size:15px;font-weight:700;color:var(--sageDk)">One Stop Shop — Book Services &amp; Safety Kits</div>
+          </div>
+          <div class="banner banner-amber">
+            <div class="banner-icon">🥔</div>
+            <div style="font-size:13px"><strong>Potato tip:</strong> Your license renews in 127 days. File your Annual Return at least 30 days before expiry to avoid penalties.</div>
+          </div>
+        </div>
+        <!-- Right Sidebar -->
+        <div>
+          <div class="card">
+            <div class="sidebar-tabs">
+              <button class="sidebar-tab-btn active" onclick="sidebarTab('lic-details',this)">License Details</button>
+              <button class="sidebar-tab-btn" onclick="sidebarTab('feedback',this)">Consumer Feedback</button>
+              <button class="sidebar-tab-btn" onclick="sidebarTab('fostac',this)">FoSTaC</button>
+            </div>
+            <!-- License Details Tab -->
+            <div id="sidebar-lic-details">
+              <div style="margin-bottom:10px"><span style="font-size:11px;color:var(--gray);text-transform:uppercase;font-weight:700;display:block">License Type</span><span style="font-weight:600;color:var(--navy)" id="sd-type">State License</span></div>
+              <div style="margin-bottom:10px"><span style="font-size:11px;color:var(--gray);text-transform:uppercase;font-weight:700;display:block">Business Name</span><span style="font-weight:600;color:var(--navy)" id="sd-bname">Annapurna Catering</span></div>
+              <div style="margin-bottom:10px"><span style="font-size:11px;color:var(--gray);text-transform:uppercase;font-weight:700;display:block">Issued</span><span style="font-weight:600;color:var(--navy)">12 March 2026</span></div>
+              <div style="margin-bottom:10px"><span style="font-size:11px;color:var(--gray);text-transform:uppercase;font-weight:700;display:block">Valid Until</span><span style="font-weight:600;color:var(--green)">12 March 2027</span></div>
+              <div><span style="font-size:11px;color:var(--gray);text-transform:uppercase;font-weight:700;display:block">District / State</span><span style="font-weight:600;color:var(--navy)">East Khasi Hills, Meghalaya</span></div>
+            </div>
+            <!-- Consumer Feedback Tab -->
+            <div id="sidebar-feedback" style="display:none">
+              <div style="margin-bottom:14px">
+                <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px">Average Ratings</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center">
+                  <div style="background:var(--sageLt);border-radius:10px;padding:10px"><div style="font-size:18px;font-weight:700;color:var(--sage)">4.2</div><div style="font-size:11px;color:var(--gray)">Food</div></div>
+                  <div style="background:var(--sageLt);border-radius:10px;padding:10px"><div style="font-size:18px;font-weight:700;color:var(--sage)">4.5</div><div style="font-size:11px;color:var(--gray)">Hygiene</div></div>
+                  <div style="background:var(--sageLt);border-radius:10px;padding:10px"><div style="font-size:18px;font-weight:700;color:var(--sage)">4.0</div><div style="font-size:11px;color:var(--gray)">Premises</div></div>
+                </div>
+              </div>
+              <div style="font-size:13px;color:var(--gray);text-align:center;padding:12px 0">No open grievances — ✅ Great compliance record!</div>
+            </div>
+            <!-- FoSTaC Tab -->
+            <div id="sidebar-fostac" style="display:none">
+              <div class="banner banner-amber" style="margin-bottom:12px"><div class="banner-icon">🎓</div><div style="font-size:13px"><strong>FoSTaC training is mandatory</strong> for all FBOs by June 2026.</div></div>
+              <div style="font-size:13px;color:var(--gray);margin-bottom:12px">Upcoming sessions near Shillong (793001):</div>
+              <div style="border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px">
+                <div style="font-size:13px;font-weight:700;color:var(--navy)">Online Session — Apr 28, 2026</div>
+                <div style="font-size:12px;color:var(--gray)">2 hours · Certificate issued</div>
+              </div>
+              <div style="display:flex;gap:8px">
+                <button class="btn-sage btn-sm" style="flex:1" onclick="enrollFoSTaC('online')">Enrol Online ₹200 →</button>
+                <button class="btn-ghost btn-sm" style="flex:1" onclick="enrollFoSTaC('centre')">Find Centre ₹350 →</button>
+              </div>
+              <div id="fostac-enrolled-msg" style="display:none;margin-top:10px;font-size:13px;color:var(--green);font-weight:700">✅ Enrolled! Training details sent to your mobile.</div>
+            </div>
+          </div>
+          <!-- Temp License card (only if hasTempLicense) -->
+          <div id="dash-temp-card" style="display:none;margin-top:16px">
+            <div class="card" style="border:2px solid var(--sage)">
+              <h4 style="font-size:14px;color:var(--navy);margin-bottom:8px">⚡ Instant Temporary License</h4>
+              <div style="font-size:12px;color:var(--gray);margin-bottom:10px">Active · Expires in <span id="dash-temp-days">30</span> days</div>
+              <button class="btn-sage btn-sm" onclick="showScreen('my-tl-screen')">View License →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- State B: Pending Application -->
+    <div id="dash-state-b" style="display:none">
+      <div class="card" style="margin-bottom:20px;padding:28px">
+        <h3 style="font-size:18px;color:var(--navy);margin-bottom:6px">Application in Progress 🔄</h3>
+        <p style="font-size:13px;color:var(--gray);margin-bottom:16px"><span id="dash-app-id-b">FSSAI-2026-38642</span> · Filed <span id="dash-filed-date">12 March 2026</span></p>
+        <div class="pipeline-row">
+          <div class="pip-step done"><div class="pip-dot">✅</div><div class="pip-label">Submitted</div></div>
+          <div class="pip-line"></div>
+          <div class="pip-step done"><div class="pip-dot">✅</div><div class="pip-label">Docs Verified</div></div>
+          <div class="pip-line"></div>
+          <div class="pip-step active"><div class="pip-dot">🔄</div><div class="pip-label">Under Review</div></div>
+          <div class="pip-line"></div>
+          <div class="pip-step"><div class="pip-dot">○</div><div class="pip-label">Approved</div></div>
+        </div>
+        <button class="btn-primary btn-sm" style="margin-top:16px" onclick="showScreen('tracker-screen')">📊 Track Details →</button>
+      </div>
+      <div class="dash-action-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="dash-action-btn" onclick="showScreen('tracker-screen')"><div class="da-icon">📊</div><div class="da-label">Track Application</div></div>
+        <div class="dash-action-btn" onclick="showScreen('documents-screen')"><div class="da-icon">📄</div><div class="da-label">Upload Missing Docs</div></div>
+        <div class="dash-action-btn" onclick="openOneStopShop()"><div class="da-icon">🛒</div><div class="da-label">One Stop Shop</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tracker Screen -->
+<div class="screen" id="tracker-screen">
+  <div class="nav-row">
+    <button class="back-btn" onclick="showScreen('dashboard-screen')">← Back</button>
+    <div class="nav-row-title">Track Application</div>
+    <button onclick="showScreen('home-screen')" class="back-btn">🏠 Home</button>
+  </div>
+  <div class="page-wrap" style="padding-top:24px">
+    <h2 style="font-size:24px;color:var(--navy);margin-bottom:4px">Track Your Application</h2>
+    <p style="font-size:13px;color:var(--gray);margin-bottom:20px" id="tracker-meta">Application ID: FSSAI-2026-38642 · Basic Registration · Filed 12 Mar 2026</p>
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTrackerTab('status',this)">📊 Application Status</button>
+      <button class="tab-btn" onclick="switchTrackerTab('docs',this)">📄 Document Processing</button>
+      <button class="tab-btn" onclick="switchTrackerTab('inspection',this)">🔍 Inspection</button>
+      <button class="tab-btn" onclick="switchTrackerTab('fostac',this)">🎓 FoSTaC Training</button>
+    </div>
+    <!-- Status Tab -->
+    <div class="tab-pane active" id="tracker-status">
+      <div class="pipeline-row" style="margin-bottom:24px">
+        <div class="pip-step done"><div class="pip-dot">✅</div><div class="pip-label">Submitted</div><div class="pip-date">12 Mar</div></div>
+        <div class="pip-line" style="background:var(--sage)"></div>
+        <div class="pip-step done"><div class="pip-dot">✅</div><div class="pip-label">Docs Verified</div><div class="pip-date">14 Mar</div></div>
+        <div class="pip-line" style="background:var(--sage)"></div>
+        <div class="pip-step active"><div class="pip-dot">🔄</div><div class="pip-label">Under Review</div><div class="pip-date">In progress</div></div>
+        <div class="pip-line"></div>
+        <div class="pip-step"><div class="pip-dot">○</div><div class="pip-label">Approved</div><div class="pip-date">Expected: Apr 10</div></div>
+      </div>
+      <div class="banner banner-sage" style="margin-bottom:20px"><div class="banner-icon">ℹ️</div><div style="font-size:13px">Your application is being processed by FSSAI Regional Office, Shillong. Expected approval within 30 days of filing.</div></div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="card" style="display:flex;gap:14px;align-items:flex-start">
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--greenLt);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px">✅</div>
+          <div><div style="font-weight:700;color:var(--navy)">Application Submitted</div><div style="font-size:13px;color:var(--gray)">Filed 12 March 2026 · ₹100 paid · App ID: FSSAI-2026-38642</div></div>
+        </div>
+        <div class="card" style="display:flex;gap:14px;align-items:flex-start">
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--greenLt);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px">✅</div>
+          <div><div style="font-weight:700;color:var(--navy)">Documents Verified</div><div style="font-size:13px;color:var(--gray)">14 March 2026 · All 3 documents accepted by system</div></div>
+        </div>
+        <div class="card" style="display:flex;gap:14px;align-items:flex-start;border-color:var(--amber)">
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--amberLt);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px">🔄</div>
+          <div><div style="font-weight:700;color:var(--navy)">Under Review</div><div style="font-size:13px;color:var(--gray)">FSSAI Regional Officer reviewing your application. Expected: 10 April 2026</div></div>
+        </div>
+        <div class="card" style="display:flex;gap:14px;align-items:flex-start;opacity:.5">
+          <div style="width:32px;height:32px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px">○</div>
+          <div><div style="font-weight:700;color:var(--navy)">License Issuance</div><div style="font-size:13px;color:var(--gray)">Pending approval</div></div>
+        </div>
+      </div>
+    </div>
+    <!-- Documents Tab -->
+    <div class="tab-pane" id="tracker-docs">
+      <div id="tracker-doc-list" style="display:flex;flex-direction:column;gap:10px">
+        <!-- Populated by JS from DB with realtime -->
+      </div>
+      <div class="banner banner-navy" style="margin-top:12px"><div class="banner-icon">🔴</div><div style="font-size:13px">Document statuses update in real-time as the officer reviews your uploads.</div></div>
+    </div>
+    <!-- Inspection Tab -->
+    <div class="tab-pane" id="tracker-inspection">
+      <div class="card">
+        <h3 style="font-size:16px;color:var(--navy);margin-bottom:14px">🔍 Scheduled Inspection</h3>
+        <div style="margin-bottom:10px"><span style="font-size:11px;color:var(--gray);text-transform:uppercase;font-weight:700;display:block">Date &amp; Time</span><span style="font-weight:600;color:var(--navy)">Not yet scheduled</span></div>
+        <div style="margin-bottom:10px"><span style="font-size:11px;color:var(--gray);text-transform:uppercase;font-weight:700;display:block">Status</span><span class="badge badge-pending">Awaiting Assignment</span></div>
+        <div class="banner banner-amber"><div class="banner-icon">ℹ️</div><div style="font-size:13px">For Basic Registration, physical inspection may not be required. You will be notified if an inspection is scheduled.</div></div>
+      </div>
+    </div>
+    <!-- FoSTaC Tab -->
+    <div class="tab-pane" id="tracker-fostac">
+      <div class="card" style="margin-bottom:16px">
+        <h3 style="font-size:16px;color:var(--navy);margin-bottom:14px">🎓 FoSTaC Food Safety Training</h3>
+        <div class="banner banner-amber" style="margin-bottom:16px"><div class="banner-icon">⚠️</div><div style="font-size:13px">FoSTaC training is <strong>mandatory</strong> for at least one person in charge. Complete by June 2026.</div></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn-sage" onclick="enrollFoSTaC('online');showScreen('fostac-quiz-screen')">Enrol Online — ₹200 →</button>
+          <button class="btn-ghost" onclick="enrollFoSTaC('centre')">Find a Training Centre — ₹350 →</button>
+        </div>
+        <div id="fostac-tracker-msg" style="display:none;margin-top:12px;font-size:13px;color:var(--green);font-weight:700">✅ Enrolled! Training details sent to your mobile.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Annual Return Screen -->
+<div class="screen" id="annual-return-screen">
+  <div class="nav-row">
+    <button class="back-btn" onclick="showScreen('dashboard-screen')">← Back</button>
+    <div class="nav-row-title">File Annual Return</div>
+    <button onclick="showScreen('home-screen')" class="back-btn">🏠 Home</button>
+  </div>
+  <div class="center-wrap">
+    <div class="card" style="padding:32px">
+      <h2 style="font-size:22px;color:var(--navy);margin-bottom:6px">Annual Return — FY 2025–26 📝</h2>
+      <p style="font-size:14px;color:var(--gray);margin-bottom:24px">File your annual return as required by FSSAI regulations.</p>
+      <div class="form-row"><label class="field-label">Annual Turnover (₹) <span class="req">*</span></label><input class="field-input" type="number" placeholder="Enter actual turnover for FY"/></div>
+      <div class="form-row"><label class="field-label">Total Food Produced/Handled (kg) <span class="req">*</span></label><input class="field-input" type="number" placeholder="Annual quantity"/></div>
+      <div class="form-row"><label class="field-label">No. of Employees <span class="req">*</span></label><input class="field-input" type="number" placeholder="Total staff count"/></div>
+      <div class="form-row"><label class="field-label">Any Complaints Received? <span class="req">*</span></label><select class="field-input"><option>No</option><option>Yes</option></select></div>
+      <div class="form-row"><label class="field-label">FoSTaC Training Completed? <span class="req">*</span></label><select class="field-input"><option>Yes</option><option>No</option></select></div>
+      <div class="banner banner-navy" style="margin-bottom:20px"><div class="banner-icon">ℹ️</div><div style="font-size:13px">Annual returns must be filed by 31st May each year. Late filing may attract a penalty of ₹100 per day.</div></div>
+      <button class="btn-primary" style="width:100%" onclick="alert('Annual return submitted successfully! Confirmation will be emailed to you.')">Submit Annual Return →</button>
+    </div>
+  </div>
+</div>
+
+<!-- My Temp License Screen -->
+<div class="screen" id="my-tl-screen">
+  <div class="nav-row">
+    <button class="back-btn" onclick="showScreen('dashboard-screen')">← Back</button>
+    <div class="nav-row-title">My Instant Temporary License</div>
+    <button onclick="showScreen('home-screen')" class="back-btn">🏠 Home</button>
+  </div>
+  <div class="center-wrap">
+    <div class="tl-card-issued">
+      <div style="font-size:11px;font-weight:700;letter-spacing:2px;opacity:.7;margin-bottom:10px">⚡ INSTANT TEMPORARY LICENSE — ACTIVE</div>
+      <div style="font-size:20px;font-weight:700;margin-bottom:4px" id="mytl-biz-name">My Business</div>
+      <div class="license-number" style="color:rgba(255,255,255,.7);margin-bottom:12px;font-size:13px" id="mytl-lic-num">TL-2026-00001</div>
+      <div style="font-size:13px;opacity:.7;margin-bottom:4px">Valid Until</div>
+      <div style="font-size:18px;font-weight:700" id="mytl-expiry">30 April 2026</div>
+      <div style="margin-top:16px" id="mytl-countdown-row">
+        <div style="font-size:12px;opacity:.7;margin-bottom:4px">Days Remaining</div>
+        <div class="countdown-display" id="mytl-days">—</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn-primary" style="flex:1" onclick="alert('PDF download coming soon')">📥 Download License PDF</button>
+      <button class="btn-ghost" style="flex:1" onclick="alert('WhatsApp share coming soon')">💬 Share</button>
+    </div>
+    <div class="banner banner-amber" style="margin-top:16px"><div class="banner-icon">⚡</div><div style="font-size:13px">This is an Instant Temporary License. To continue operating after expiry, apply for a Permanent License before it expires.</div></div>
+    <button class="btn-sage" style="width:100%;margin-top:12px" onclick="startFBOFlow()">Apply for Permanent License →</button>
+  </div>
+</div>
+
+<!-- FoSTaC Quiz Screen -->
+<div class="screen" id="fostac-quiz-screen">
+  <div class="nav-row">
+    <button class="back-btn" onclick="showScreen('tracker-screen')">← Back</button>
+    <div class="nav-row-title">FoSTaC Training</div>
+    <button onclick="showScreen('home-screen')" class="back-btn">🏠 Home</button>
+  </div>
+  <div class="center-wrap">
+    <div class="card" style="padding:28px">
+      <h2 style="font-size:20px;color:var(--navy);margin-bottom:6px">🎓 Food Safety Training Quiz</h2>
+      <p style="font-size:13px;color:var(--gray);margin-bottom:20px">Module 1 of 3: Basic Food Safety Principles · 5 questions</p>
+      <div id="quiz-container">
+        <div style="margin-bottom:20px">
+          <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:12px">Q1. What is the temperature danger zone for food?</div>
+          <div style="display:flex;flex-direction:column;gap:8px" id="q1-opts">
+            <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer"><input type="radio" name="q1" value="a"/> 0°C to 20°C</label>
+            <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer"><input type="radio" name="q1" value="b"/> 5°C to 60°C</label>
+            <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer"><input type="radio" name="q1" value="c"/> 20°C to 80°C</label>
+            <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer"><input type="radio" name="q1" value="d"/> 40°C to 100°C</label>
+          </div>
+        </div>
+        <div style="margin-bottom:20px">
+          <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:12px">Q2. How often should food handlers wash their hands?</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer"><input type="radio" name="q2" value="a"/> Once a day</label>
+            <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer"><input type="radio" name="q2" value="b"/> Before and after handling food</label>
+            <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer"><input type="radio" name="q2" value="c"/> Only when visibly dirty</label>
+            <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer"><input type="radio" name="q2" value="d"/> Twice a day</label>
+          </div>
+        </div>
+        <button class="btn-primary" style="width:100%" onclick="submitQuiz()">Submit Answers →</button>
+      </div>
+      <div id="quiz-result" style="display:none;text-align:center;padding:20px 0">
+        <div class="success-circle check-pop">🎓</div>
+        <h3 style="color:var(--green);font-size:20px;margin-bottom:8px">Quiz Passed! 2/2 Correct</h3>
+        <p style="font-size:13px;color:var(--gray);margin-bottom:16px">Your certificate will be issued within 24 hours to your mobile number.</p>
+        <button class="btn-sage" onclick="showScreen('tracker-screen')">Back to Tracker</button>
+      </div>
+    </div>
+  </div>
+</div>

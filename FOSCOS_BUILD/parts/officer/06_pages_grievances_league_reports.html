@@ -1,0 +1,186 @@
+<!-- ══════════════════════════════════════════════════════════════
+     PART 06 — GRIEVANCES + CLEAN KITCHEN LEAGUE + REPORTS + SETTINGS
+     ══════════════════════════════════════════════════════════════ -->
+
+<!-- ▌ GRIEVANCES ▌ -->
+<div class="page" id="page-grievances">
+  <div class="toolbar">
+    <div class="tb-inp"><span style="color:var(--g400)">🔍</span><input type="text" placeholder="Search grievances…" id="griev-search" oninput="renderGrievances()"/></div>
+    <div class="ftabs" id="griev-ftabs">
+      <div class="ft active" onclick="setFilt('griev','All',this)">All</div>
+      <div class="ft" onclick="setFilt('griev','Critical',this)">Critical</div>
+      <div class="ft" onclick="setFilt('griev','High',this)">High</div>
+      <div class="ft" onclick="setFilt('griev','Under Review',this)">Under Review</div>
+      <div class="ft" onclick="setFilt('griev','Resolved',this)">Resolved</div>
+    </div>
+  </div>
+  <div id="grievance-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+</div>
+
+<!-- ▌ CLEAN KITCHEN LEAGUE ▌ -->
+<div class="page" id="page-league">
+  <div style="margin-bottom:18px;">
+    <h2 style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--navy);margin-bottom:4px;">🏆 Clean Kitchen League</h2>
+    <p style="font-size:13px;color:var(--g500);">Monthly food safety and compliance rankings. Updated every 1st of the month.</p>
+  </div>
+
+  <!-- Top 3 podium -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:18px;">
+    <div class="lcard silver" style="margin-top:20px;">
+      <div class="lcard-rank">🥈</div>
+      <div style="font-size:28px;margin-bottom:8px;">🍱</div>
+      <div style="font-size:13px;font-weight:700;color:var(--navy);">Meera Tiffin Service</div>
+      <div style="font-size:11px;color:var(--g500);margin-top:2px;">State License · Mawlai</div>
+      <div class="lcard-score">94.2</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;"><span style="color:var(--g500);width:80px;flex-shrink:0;">Compliance</span><div style="flex:1;height:4px;background:var(--g100);border-radius:99px;overflow:hidden;"><div style="height:100%;width:96%;background:var(--sage);border-radius:99px;"></div></div><span style="color:var(--g700);font-weight:600;width:24px;text-align:right;">96</span></div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;"><span style="color:var(--g500);width:80px;flex-shrink:0;">Hygiene</span><div style="flex:1;height:4px;background:var(--g100);border-radius:99px;overflow:hidden;"><div style="height:100%;width:93%;background:var(--sage);border-radius:99px;"></div></div><span style="color:var(--g700);font-weight:600;width:24px;text-align:right;">93</span></div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;"><span style="color:var(--g500);width:80px;flex-shrink:0;">Consumer</span><div style="flex:1;height:4px;background:var(--g100);border-radius:99px;overflow:hidden;"><div style="height:100%;width:94%;background:var(--amber);border-radius:99px;"></div></div><span style="color:var(--g700);font-weight:600;width:24px;text-align:right;">94</span></div>
+      </div>
+    </div>
+
+    <div class="lcard gold" style="transform:scale(1.04);box-shadow:0 8px 32px rgba(0,0,0,.12);">
+      <div class="lcard-rank">🥇</div>
+      <div style="font-size:28px;margin-bottom:8px;">🍽️</div>
+      <div style="font-size:13px;font-weight:700;color:var(--navy);">Annapurna Catering</div>
+      <div style="font-size:11px;color:var(--g500);margin-top:2px;">State License · Laitumkhrah</div>
+      <div class="lcard-score">97.8</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;"><span style="color:var(--g500);width:80px;flex-shrink:0;">Compliance</span><div style="flex:1;height:4px;background:var(--g100);border-radius:99px;overflow:hidden;"><div style="height:100%;width:99%;background:var(--sage);border-radius:99px;"></div></div><span style="color:var(--g700);font-weight:600;width:24px;text-align:right;">99</span></div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;"><span style="color:var(--g500);width:80px;flex-shrink:0;">Hygiene</span><div style="flex:1;height:4px;background:var(--g100);border-radius:99px;overflow:hidden;"><div style="height:100%;width:97%;background:var(--sage);border-radius:99px;"></div></div><span style="color:var(--g700);font-weight:600;width:24px;text-align:right;">97</span></div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;"><span style="color:var(--g500);width:80px;flex-shrink:0;">Consumer</span><div style="flex:1;height:4px;background:var(--g100);border-radius:99px;overflow:hidden;"><div style="height:100%;width:98%;background:var(--amber);border-radius:99px;"></div></div><span style="color:var(--g700);font-weight:600;width:24px;text-align:right;">98</span></div>
+      </div>
+    </div>
+
+    <div class="lcard bronze" style="margin-top:20px;">
+      <div class="lcard-rank">🥉</div>
+      <div style="font-size:28px;margin-bottom:8px;">🥤</div>
+      <div style="font-size:13px;font-weight:700;color:var(--navy);">Fresh Juice Hub</div>
+      <div style="font-size:11px;color:var(--g500);margin-top:2px;">Basic Registration · Nongthymmai</div>
+      <div class="lcard-score">91.4</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;"><span style="color:var(--g500);width:80px;flex-shrink:0;">Compliance</span><div style="flex:1;height:4px;background:var(--g100);border-radius:99px;overflow:hidden;"><div style="height:100%;width:93%;background:var(--sage);border-radius:99px;"></div></div><span style="color:var(--g700);font-weight:600;width:24px;text-align:right;">93</span></div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;"><span style="color:var(--g500);width:80px;flex-shrink:0;">Hygiene</span><div style="flex:1;height:4px;background:var(--g100);border-radius:99px;overflow:hidden;"><div style="height:100%;width:89%;background:var(--sage);border-radius:99px;"></div></div><span style="color:var(--g700);font-weight:600;width:24px;text-align:right;">89</span></div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;"><span style="color:var(--g500);width:80px;flex-shrink:0;">Consumer</span><div style="flex:1;height:4px;background:var(--g100);border-radius:99px;overflow:hidden;"><div style="height:100%;width:92%;background:var(--amber);border-radius:99px;"></div></div><span style="color:var(--g700);font-weight:600;width:24px;text-align:right;">92</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full leaderboard table -->
+  <div class="card card-flush">
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Rank</th><th>Business</th><th>Category</th><th>Compliance</th><th>Hygiene</th><th>Consumer Rating</th><th>Score</th><th>Change</th></tr></thead>
+      <tbody>
+        <tr><td><strong>1</strong> 🥇</td><td><strong>Annapurna Catering</strong></td><td>State License</td><td><span class="badge b-green">99</span></td><td><span class="badge b-green">97</span></td><td>⭐ 4.5</td><td><strong style="color:var(--navy);">97.8</strong></td><td style="color:var(--green);font-size:11px;">▲ 2</td></tr>
+        <tr><td><strong>2</strong> 🥈</td><td><strong>Meera Tiffin Service</strong></td><td>State License</td><td><span class="badge b-green">96</span></td><td><span class="badge b-green">93</span></td><td>⭐ 4.1</td><td><strong style="color:var(--navy);">94.2</strong></td><td style="color:var(--g400);font-size:11px;">— 0</td></tr>
+        <tr><td><strong>3</strong> 🥉</td><td><strong>Fresh Juice Hub</strong></td><td>Basic Reg.</td><td><span class="badge b-green">93</span></td><td><span class="badge b-sage">89</span></td><td>⭐ 4.2</td><td><strong style="color:var(--navy);">91.4</strong></td><td style="color:var(--green);font-size:11px;">▲ 1</td></tr>
+        <tr><td><strong>4</strong></td><td>Spice Garden Restaurant</td><td>State License</td><td><span class="badge b-amber">78</span></td><td><span class="badge b-amber">80</span></td><td>⭐ 3.8</td><td>79.0</td><td style="color:var(--red);font-size:11px;">▼ 1</td></tr>
+        <tr><td><strong>5</strong></td><td>Mountain Bakery</td><td>Basic Reg.</td><td><span class="badge b-amber">75</span></td><td><span class="badge b-amber">72</span></td><td>⭐ 3.9</td><td>74.5</td><td style="color:var(--g400);font-size:11px;">— 0</td></tr>
+        <tr><td><strong>6</strong></td><td>Raj Snacks Corner</td><td>Basic Reg.</td><td><span class="badge b-red">45</span></td><td><span class="badge b-red">48</span></td><td>⭐ 2.9</td><td>46.8</td><td style="color:var(--red);font-size:11px;">▼ 3</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ▌ REPORTS ▌ -->
+<div class="page" id="page-reports">
+  <div style="margin-bottom:18px;">
+    <h2 style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--navy);margin-bottom:4px;">Reports &amp; Analytics</h2>
+    <p style="font-size:13px;color:var(--g500);">Generate and download compliance, inspection, and licensing reports.</p>
+  </div>
+  <div class="g3">
+    <div class="card" style="cursor:pointer;" onclick="showToast('Generating Licensing Activity Report…')">
+      <div style="font-size:32px;margin-bottom:12px;">📋</div>
+      <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px;">Licensing Activity</div>
+      <div style="font-size:12px;color:var(--g500);line-height:1.5;margin-bottom:14px;">Applications filed, approved, rejected by month. Category breakdown and trends.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();showToast('Opening preview…')">Preview</button>
+        <button class="btn btn-primary btn-xs" onclick="event.stopPropagation();showToast('Downloading PDF…')">⬇ Download PDF</button>
+      </div>
+    </div>
+    <div class="card" style="cursor:pointer;" onclick="showToast('Generating Compliance Summary Report…')">
+      <div style="font-size:32px;margin-bottom:12px;">🧪</div>
+      <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px;">Compliance Summary</div>
+      <div style="font-size:12px;color:var(--g500);line-height:1.5;margin-bottom:14px;">Test results, overdue businesses, zone-wise compliance rates and risk distribution.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();showToast('Opening preview…')">Preview</button>
+        <button class="btn btn-primary btn-xs" onclick="event.stopPropagation();showToast('Downloading PDF…')">⬇ Download PDF</button>
+      </div>
+    </div>
+    <div class="card" style="cursor:pointer;" onclick="showToast('Generating Inspection Report…')">
+      <div style="font-size:32px;margin-bottom:12px;">🔍</div>
+      <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px;">Inspection Report</div>
+      <div style="font-size:12px;color:var(--g500);line-height:1.5;margin-bottom:14px;">Completed inspections, pass/fail rates, overdue, and officer performance.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();showToast('Opening preview…')">Preview</button>
+        <button class="btn btn-primary btn-xs" onclick="event.stopPropagation();showToast('Downloading PDF…')">⬇ Download PDF</button>
+      </div>
+    </div>
+    <div class="card" style="cursor:pointer;" onclick="showToast('Generating Grievances Report…')">
+      <div style="font-size:32px;margin-bottom:12px;">💬</div>
+      <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px;">Grievances Report</div>
+      <div style="font-size:12px;color:var(--g500);line-height:1.5;margin-bottom:14px;">Complaint volumes, resolution times, priority breakdown, and FBO-level risk flags.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();showToast('Opening preview…')">Preview</button>
+        <button class="btn btn-primary btn-xs" onclick="event.stopPropagation();showToast('Downloading PDF…')">⬇ Download PDF</button>
+      </div>
+    </div>
+    <div class="card" style="cursor:pointer;" onclick="showToast('Generating Annual Returns Report…')">
+      <div style="font-size:32px;margin-bottom:12px;">📅</div>
+      <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px;">Annual Returns Status</div>
+      <div style="font-size:12px;color:var(--g500);line-height:1.5;margin-bottom:14px;">Filed vs pending annual returns, non-compliant businesses, pending notices.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();showToast('Opening preview…')">Preview</button>
+        <button class="btn btn-primary btn-xs" onclick="event.stopPropagation();showToast('Downloading PDF…')">⬇ Download PDF</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ▌ SETTINGS ▌ -->
+<div class="page" id="page-settings">
+  <div style="max-width:600px;">
+    <h2 style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--navy);margin-bottom:18px;">Settings &amp; Profile</h2>
+
+    <div class="card" style="margin-bottom:14px;">
+      <div class="sh"><div class="sh-t">Officer Profile</div><button class="btn btn-ghost btn-xs" onclick="showToast('Edit mode coming soon')">Edit</button></div>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+        <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--navyDk));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:20px;" id="profile-avatar-lg">RK</div>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:var(--navy);" id="profile-name">Rajesh Kumar</div>
+          <div style="font-size:12px;color:var(--g500);" id="profile-role">Senior FSSAI Officer · Meghalaya Region</div>
+          <div style="font-size:12px;color:var(--g400);" id="profile-mobile">+91 98765 43210</div>
+        </div>
+      </div>
+      <div class="info-grid">
+        <div><div class="if-lbl">Officer ID</div><div class="if-val" id="profile-id">OFF-MEG-2024-001</div></div>
+        <div><div class="if-lbl">Zone</div><div class="if-val">East Khasi Hills</div></div>
+        <div><div class="if-lbl">Designation</div><div class="if-val">Senior Food Safety Officer</div></div>
+        <div><div class="if-lbl">Cases This Month</div><div class="if-val">23</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px;">
+      <div class="sh"><div class="sh-t">Notifications</div></div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div><div style="font-size:13px;font-weight:600;color:var(--navy);">New Applications</div><div style="font-size:11px;color:var(--g500);">Get notified when new applications are assigned to you</div></div>
+          <input type="checkbox" checked style="width:18px;height:18px;accent-color:var(--sage);cursor:pointer;"/>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div><div style="font-size:13px;font-weight:600;color:var(--navy);">SLA Warnings</div><div style="font-size:11px;color:var(--g500);">Alert when cases are approaching SLA deadline</div></div>
+          <input type="checkbox" checked style="width:18px;height:18px;accent-color:var(--sage);cursor:pointer;"/>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div><div style="font-size:13px;font-weight:600;color:var(--navy);">High-Priority Grievances</div><div style="font-size:11px;color:var(--g500);">Immediate alert for critical complaints</div></div>
+          <input type="checkbox" checked style="width:18px;height:18px;accent-color:var(--sage);cursor:pointer;"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sh"><div class="sh-t">Account</div></div>
+      <button class="btn btn-red btn-sm" onclick="officerLogout()">Log Out</button>
+    </div>
+  </div>
+</div>

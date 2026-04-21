@@ -1,0 +1,281 @@
+<!-- ═══════════════════════════════════════════════════════
+     FLOW 3: One Stop Shop, Review, Payment
+     ═══════════════════════════════════════════════════════ -->
+
+<!-- One Stop Shop -->
+<div class="screen" id="one-stop-screen">
+  <div class="nav-row">
+    <button class="back-btn" onclick="showScreen('documents-screen')">← Back</button>
+    <div class="nav-row-title">One Stop Shop 🛒</div>
+    <button onclick="showScreen('home-screen')" class="back-btn">🏠 Home</button>
+  </div>
+  <div class="page-wrap" style="padding-top:24px">
+    <h2 style="font-size:26px;color:var(--navy);margin-bottom:6px">One Stop Shop 🛒</h2>
+    <p style="color:var(--gray);margin-bottom:20px">Book services, safety kits, and hygiene checks — all from one place.</p>
+
+    <div class="oss-layout">
+      <!-- Content area -->
+      <div class="oss-content">
+        <!-- Water Testing -->
+        <div class="tab-pane" id="oss-water">
+          <h3 style="font-size:17px;color:var(--navy);margin-bottom:4px">💧 Water Testing</h3>
+          <div class="banner banner-amber" style="margin-bottom:16px"><div class="banner-icon">ℹ️</div><div style="font-size:13px">A water potability report is required for State and Central License holders.</div></div>
+          <div class="lab-card" id="lab-0">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div><strong style="font-size:14px;color:var(--navy)">Central Food Laboratory, Shillong</strong><br><span style="font-size:12px;color:var(--gray)">⭐ 4.8 · Turnaround: 3 days</span></div>
+              <div style="text-align:right"><div style="font-size:17px;font-weight:700;color:var(--navy)">₹800</div><button class="btn-sage btn-sm" style="margin-top:6px" onclick="bookLab(0)">Book →</button></div>
+            </div>
+          </div>
+          <div class="lab-card" id="lab-1">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div><strong style="font-size:14px;color:var(--navy)">NABL Accredited Lab, Guwahati</strong><br><span style="font-size:12px;color:var(--gray)">⭐ 4.6 · Turnaround: 5 days</span></div>
+              <div style="text-align:right"><div style="font-size:17px;font-weight:700;color:var(--navy)">₹1,200</div><button class="btn-sage btn-sm" style="margin-top:6px" onclick="bookLab(1)">Book →</button></div>
+            </div>
+          </div>
+          <div class="lab-card" id="lab-2">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div><strong style="font-size:14px;color:var(--navy)">QuickTest Mobile Lab</strong><br><span style="font-size:12px;color:var(--gray)">⭐ 4.3 · Turnaround: 1 day (express)</span></div>
+              <div style="text-align:right"><div style="font-size:17px;font-weight:700;color:var(--navy)">₹1,500</div><button class="btn-sage btn-sm" style="margin-top:6px" onclick="bookLab(2)">Book →</button></div>
+            </div>
+          </div>
+        </div>
+        <!-- Medical Cert -->
+        <div class="tab-pane" id="oss-medical">
+          <h3 style="font-size:17px;color:var(--navy);margin-bottom:12px">🩺 Medical Certificate</h3>
+          <p style="font-size:14px;color:var(--gray);margin-bottom:16px">Required for all food handlers. Valid for 1 year.</p>
+          <div class="lab-card"><div style="display:flex;justify-content:space-between;align-items:center"><div><strong style="color:var(--navy)">District Hospital, Shillong</strong><br><span style="font-size:12px;color:var(--gray)">Walk-in: Mon–Sat 9am–1pm</span></div><div><div style="font-size:17px;font-weight:700;color:var(--navy)">₹200</div><button class="btn-sage btn-sm" style="margin-top:6px" onclick="ossAddCart('Medical Certificate',200)">Book →</button></div></div></div>
+          <div class="lab-card"><div style="display:flex;justify-content:space-between;align-items:center"><div><strong style="color:var(--navy)">Apollo Clinic, Laitumkhrah</strong><br><span style="font-size:12px;color:var(--gray)">Appointment: 24hr slots available</span></div><div><div style="font-size:17px;font-weight:700;color:var(--navy)">₹350</div><button class="btn-sage btn-sm" style="margin-top:6px" onclick="ossAddCart('Medical Certificate (Apollo)',350)">Book →</button></div></div></div>
+        </div>
+        <!-- Fire Safety -->
+        <div class="tab-pane" id="oss-fire">
+          <h3 style="font-size:17px;color:var(--navy);margin-bottom:12px">🔥 Fire Safety Certificate</h3>
+          <p style="font-size:14px;color:var(--gray);margin-bottom:16px">Mandatory for restaurants, caterers &amp; food manufacturers.</p>
+          <div class="lab-card"><div style="display:flex;justify-content:space-between;align-items:center"><div><strong style="color:var(--navy)">Fire &amp; Emergency Services, Meghalaya</strong><br><span style="font-size:12px;color:var(--gray)">Govt. inspection, 5–7 working days</span></div><div><div style="font-size:17px;font-weight:700;color:var(--navy)">₹500</div><button class="btn-sage btn-sm" style="margin-top:6px" onclick="ossAddCart('Fire Safety Certificate',500)">Apply →</button></div></div></div>
+        </div>
+        <!-- Food Testing Kit -->
+        <div class="tab-pane active" id="oss-kit">
+          <h3 style="font-size:17px;color:var(--navy);margin-bottom:12px">🧰 Food Testing Kit</h3>
+          <div style="border:2px solid var(--border);border-radius:14px;padding:20px;margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+              <div><strong style="font-size:15px;color:var(--navy)">Starter Kit</strong><br><span style="font-size:12px;color:var(--gray)">Adulteration &amp; freshness tests, 50 tests included</span></div>
+              <div style="font-size:18px;font-weight:700;color:var(--navy)">₹1,200</div>
+            </div>
+            <button class="btn-sage btn-sm" onclick="ossAddCart('Food Testing Kit (Starter)',1200)">Add to Cart →</button>
+          </div>
+          <div style="border:2px solid var(--amber);border-radius:14px;padding:20px;background:var(--amberLt);margin-bottom:12px">
+            <div style="font-size:10px;font-weight:700;color:var(--amberDk);letter-spacing:1px;margin-bottom:6px">MOST POPULAR</div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+              <div><strong style="font-size:15px;color:var(--navy)">Advanced Kit</strong><br><span style="font-size:12px;color:var(--gray)">150 tests, pesticide &amp; heavy metal detection</span></div>
+              <div style="font-size:18px;font-weight:700;color:var(--navy)">₹3,500</div>
+            </div>
+            <button class="btn-primary btn-sm" onclick="ossAddCart('Food Testing Kit (Advanced)',3500)">Add to Cart →</button>
+          </div>
+          <div style="border:2px solid var(--border);border-radius:14px;padding:20px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+              <div><strong style="font-size:15px;color:var(--navy)">Complete Lab Kit</strong><br><span style="font-size:12px;color:var(--gray)">300 tests, full microbiological panel</span></div>
+              <div style="font-size:18px;font-weight:700;color:var(--navy)">₹7,000</div>
+            </div>
+            <button class="btn-sage btn-sm" onclick="ossAddCart('Food Testing Kit (Complete)',7000)">Add to Cart →</button>
+          </div>
+        </div>
+        <!-- User Manual -->
+        <div class="tab-pane" id="oss-manual">
+          <h3 style="font-size:17px;color:var(--navy);margin-bottom:12px">📖 User Manual</h3>
+          <p style="font-size:14px;color:var(--gray);margin-bottom:20px">Download the official FSSAI Food Business Operator Manual — covers licensing, compliance, hygiene standards, and penalties.</p>
+          <button class="btn-primary" id="manual-download-btn" onclick="ossDownloadManual()">📥 Download User Manual (PDF)</button>
+          <div style="margin-top:16px;font-size:13px;color:var(--gray)">Version 4.2 · Updated March 2026 · 2.4 MB</div>
+        </div>
+        <!-- Hygiene Check -->
+        <div class="tab-pane" id="oss-hygiene">
+          <h3 style="font-size:17px;color:var(--navy);margin-bottom:12px">🧹 Hygiene Check</h3>
+          <p style="font-size:14px;color:var(--gray);margin-bottom:16px">Regular hygiene inspections by certified FSSAI auditors.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div style="border:2px solid var(--border);border-radius:14px;padding:18px;text-align:center">
+              <div style="font-size:22px;margin-bottom:8px">📅</div>
+              <div style="font-weight:700;color:var(--navy);margin-bottom:4px">Monthly Plan</div>
+              <div style="font-size:22px;font-weight:700;color:var(--amber);margin-bottom:8px">₹999<span style="font-size:13px;color:var(--gray)">/month</span></div>
+              <button class="btn-sage btn-sm" style="width:100%" onclick="ossAddCart('Hygiene Check (Monthly)',999)">Subscribe →</button>
+            </div>
+            <div style="border:2px solid var(--amber);border-radius:14px;padding:18px;text-align:center;background:var(--amberLt)">
+              <div style="font-size:22px;margin-bottom:8px">🏆</div>
+              <div style="font-weight:700;color:var(--navy);margin-bottom:4px">Annual Plan</div>
+              <div style="font-size:22px;font-weight:700;color:var(--amber);margin-bottom:8px">₹8,999<span style="font-size:13px;color:var(--gray)">/year</span></div>
+              <button class="btn-primary btn-sm" style="width:100%" onclick="ossAddCart('Hygiene Check (Annual)',8999)">Subscribe →</button>
+            </div>
+          </div>
+        </div>
+        <!-- Pest Control -->
+        <div class="tab-pane" id="oss-pest">
+          <h3 style="font-size:17px;color:var(--navy);margin-bottom:12px">🐛 Pest Control</h3>
+          <p style="font-size:14px;color:var(--gray);margin-bottom:16px">2 visits/month by licensed pest control operators. FSSAI approved.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div style="border:2px solid var(--border);border-radius:14px;padding:18px;text-align:center">
+              <div style="font-weight:700;color:var(--navy);margin-bottom:4px">Monthly Plan</div>
+              <div style="font-size:22px;font-weight:700;color:var(--amber);margin-bottom:8px">₹1,200<span style="font-size:13px;color:var(--gray)">/month</span></div>
+              <button class="btn-sage btn-sm" style="width:100%" onclick="ossAddCart('Pest Control (Monthly)',1200)">Subscribe →</button>
+            </div>
+            <div style="border:2px solid var(--sage);border-radius:14px;padding:18px;text-align:center;background:var(--sageLt)">
+              <div style="font-weight:700;color:var(--navy);margin-bottom:4px">Annual Plan</div>
+              <div style="font-size:22px;font-weight:700;color:var(--amber);margin-bottom:8px">₹10,000<span style="font-size:13px;color:var(--gray)">/year</span></div>
+              <button class="btn-sage btn-sm" style="width:100%" onclick="ossAddCart('Pest Control (Annual)',10000)">Subscribe →</button>
+            </div>
+          </div>
+        </div>
+        <!-- Garbage Pickup -->
+        <div class="tab-pane" id="oss-garbage">
+          <h3 style="font-size:17px;color:var(--navy);margin-bottom:12px">♻️ Garbage Pickup Subscription</h3>
+          <p style="font-size:14px;color:var(--gray);margin-bottom:16px">Daily commercial waste pickup from your business premises.</p>
+          <div style="border:2px solid var(--border);border-radius:14px;padding:20px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <div><strong style="color:var(--navy)">Daily Pickup — Municipal Tie-Up</strong><br><span style="font-size:12px;color:var(--gray)">7 days/week, certified waste handlers</span></div>
+              <div style="font-size:20px;font-weight:700;color:var(--amber)">₹500<span style="font-size:13px;color:var(--gray)">/month</span></div>
+            </div>
+            <button class="btn-sage" onclick="ossAddCart('Garbage Pickup (Monthly)',500)">Subscribe →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Vertical Tab Rail -->
+      <div class="oss-tab-rail">
+        <button class="oss-tab-btn" onclick="ossTab('water',this)">💧<br>Water<br>Testing</button>
+        <button class="oss-tab-btn" onclick="ossTab('medical',this)">🩺<br>Medical<br>Cert</button>
+        <button class="oss-tab-btn" onclick="ossTab('fire',this)">🔥<br>Fire<br>Safety</button>
+        <button class="oss-tab-btn active" onclick="ossTab('kit',this)">🧰<br>Food<br>Testing</button>
+        <button class="oss-tab-btn" onclick="ossTab('manual',this)">📖<br>User<br>Manual</button>
+        <button class="oss-tab-btn" onclick="ossTab('hygiene',this)">🧹<br>Hygiene<br>Check</button>
+        <button class="oss-tab-btn" onclick="ossTab('pest',this)">🐛<br>Pest<br>Control</button>
+        <button class="oss-tab-btn" onclick="ossTab('garbage',this)">♻️<br>Garbage<br>Pickup</button>
+      </div>
+    </div>
+
+    <!-- Cart bar -->
+    <div class="oss-cart-bar" id="oss-cart-bar">
+      <div>🛒 <span id="oss-cart-items">0 items</span> · <strong id="oss-cart-total">₹0</strong></div>
+      <button class="btn-sage btn-sm" onclick="goFlow('review-screen',3)">Review &amp; Pay →</button>
+    </div>
+
+    <div style="position:sticky;bottom:0;background:var(--cream);padding:16px 0;border-top:1px solid var(--border);margin-top:16px">
+      <button class="btn-primary" style="width:100%" onclick="goFlow('review-screen',3)">Continue to Review →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Review Screen -->
+<div class="screen" id="review-screen">
+  <div class="nav-row">
+    <button class="back-btn" onclick="showScreen('one-stop-screen')">← Back</button>
+    <div class="nav-row-title">Review Application</div>
+    <button onclick="showScreen('home-screen')" class="back-btn">🏠 Home</button>
+  </div>
+  <div class="page-wrap" style="padding-top:24px">
+    <h2 style="font-size:26px;color:var(--navy);margin-bottom:6px">Almost there — let's review! 🎉</h2>
+    <p style="color:var(--gray);margin-bottom:24px">Potato has scanned your application. — Ready to submit!</p>
+    <div class="two-col">
+      <!-- Left: Summary -->
+      <div>
+        <div class="card" style="margin-bottom:16px">
+          <h3 style="font-size:16px;color:var(--navy);margin-bottom:16px">📋 Application Summary</h3>
+          <div id="review-fields">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+        <button class="btn-ghost" style="width:100%" onclick="previewApplication()">👁️ Preview Application</button>
+        <div id="preview-msg" style="text-align:center;font-size:13px;color:var(--sage);margin-top:8px;display:none">✅ PDF Ready — opening preview...</div>
+      </div>
+      <!-- Right: Fee Breakdown -->
+      <div>
+        <div class="card" style="margin-bottom:16px">
+          <h3 style="font-size:16px;color:var(--navy);margin-bottom:16px">💰 Fee Breakdown</h3>
+          <div id="review-fee-rows" style="margin-bottom:12px"></div>
+          <div style="border-top:2px solid var(--border);padding-top:12px;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:15px;font-weight:700;color:var(--charcoal)">Total Amount</span>
+            <span style="font-size:24px;font-weight:700;color:var(--amber)" id="review-grand-total">₹0</span>
+          </div>
+        </div>
+        <div class="banner banner-amber">
+          <div class="banner-icon">🥔</div>
+          <div style="font-size:13px"><strong>Potato says:</strong> Your application looks complete. Proceed to payment to submit your FSSAI license application.</div>
+        </div>
+      </div>
+    </div>
+    <div style="position:sticky;bottom:0;background:var(--cream);padding:16px 0;border-top:1px solid var(--border);margin-top:20px">
+      <button class="btn-primary" style="width:100%" onclick="goFlow('payment-options-screen',3)">Proceed to Payment →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Payment Options Screen -->
+<div class="screen" id="payment-options-screen">
+  <div class="nav-row">
+    <button class="back-btn" onclick="showScreen('review-screen')">← Back</button>
+    <div class="nav-row-title">Select Payment Method</div>
+    <button onclick="showScreen('home-screen')" class="back-btn">🏠 Home</button>
+  </div>
+  <div class="center-wrap">
+    <div class="card" style="padding:32px">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-size:13px;color:var(--gray);margin-bottom:4px">Total Amount Due</div>
+        <div style="font-size:36px;font-weight:700;color:var(--amber)" id="payment-total-display">₹100</div>
+        <div style="font-size:12px;color:var(--gray);margin-top:4px">Secure payment via PayGov</div>
+      </div>
+      <div class="pay-card" onclick="selectPayment('upi',this)" id="pay-upi">
+        <div class="pay-check">✓</div>
+        <span style="font-size:24px">📱</span>
+        <div><div style="font-weight:700;color:var(--navy)">UPI</div><div style="font-size:12px;color:var(--gray)">PhonePe, Google Pay, BHIM, Paytm</div></div>
+      </div>
+      <div class="pay-card" onclick="selectPayment('netbanking',this)" id="pay-nb">
+        <div class="pay-check">✓</div>
+        <span style="font-size:24px">🏦</span>
+        <div><div style="font-weight:700;color:var(--navy)">Net Banking</div><div style="font-size:12px;color:var(--gray)">All major banks</div></div>
+      </div>
+      <div class="pay-card" onclick="selectPayment('card',this)" id="pay-card">
+        <div class="pay-check">✓</div>
+        <span style="font-size:24px">💳</span>
+        <div><div style="font-weight:700;color:var(--navy)">Debit / Credit Card</div><div style="font-size:12px;color:var(--gray)">Visa, Mastercard, RuPay</div></div>
+      </div>
+      <div class="pay-card" onclick="selectPayment('wallet',this)" id="pay-wallet">
+        <div class="pay-check">✓</div>
+        <span style="font-size:24px">👛</span>
+        <div><div style="font-weight:700;color:var(--navy)">Wallet</div><div style="font-size:12px;color:var(--gray)">Paytm, Amazon Pay, Mobikwik</div></div>
+      </div>
+      <button class="btn-primary" style="width:100%;margin-top:8px" onclick="proceedToPayment()">🔒 Pay Now →</button>
+      <p style="text-align:center;font-size:12px;color:var(--gray);margin-top:12px">🔒 Secured by PayGov — Government Payment Gateway</p>
+    </div>
+  </div>
+</div>
+
+<!-- Payment Processing Screen -->
+<div class="screen" id="payment-screen">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--cream)">
+    <div class="card" style="max-width:480px;width:100%;padding:48px;text-align:center">
+      <!-- Processing state -->
+      <div id="payment-processing">
+        <div style="font-size:48px;margin-bottom:16px">🔒</div>
+        <h2 style="font-size:22px;color:var(--navy);margin-bottom:8px">Redirecting to PayGov…</h2>
+        <p style="font-size:14px;color:var(--gray);margin-bottom:24px">Please wait while we process your payment securely.</p>
+        <div style="background:var(--border);border-radius:8px;overflow:hidden;height:8px;margin-bottom:16px">
+          <div id="payment-progress-bar" style="height:100%;background:linear-gradient(90deg,var(--sage),var(--amber));border-radius:8px;width:0%;transition:width 2.2s ease"></div>
+        </div>
+        <div style="font-size:13px;color:var(--gray)" id="payment-step-text">Connecting to PayGov...</div>
+      </div>
+      <!-- Success state -->
+      <div id="payment-success" style="display:none">
+        <div class="success-circle check-pop">✅</div>
+        <h2 style="font-size:26px;color:var(--green);margin-bottom:8px">Application Submitted!</h2>
+        <p style="font-size:14px;color:var(--gray);margin-bottom:24px">Your FSSAI license application has been received.</p>
+        <div style="background:var(--navyLt);border-radius:14px;padding:20px;text-align:left;margin-bottom:20px">
+          <div style="margin-bottom:10px"><span style="font-size:11px;color:var(--gray);text-transform:uppercase;font-weight:700">Application ID</span><br><span class="license-number" id="success-app-id">FSSAI-2026-38642</span></div>
+          <div style="margin-bottom:10px"><span style="font-size:11px;color:var(--gray);text-transform:uppercase;font-weight:700">License Type</span><br><span style="font-weight:600;color:var(--navy)" id="success-license-type">Basic Registration</span></div>
+          <div style="margin-bottom:10px"><span style="font-size:11px;color:var(--gray);text-transform:uppercase;font-weight:700">Expected Approval</span><br><span style="font-weight:600;color:var(--navy)">Within 30 days</span></div>
+          <div><span style="font-size:11px;color:var(--gray);text-transform:uppercase;font-weight:700">Amount Paid</span><br><span style="font-weight:600;color:var(--green)" id="success-amount">₹100</span></div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+          <button class="btn-ghost" style="flex:1" onclick="alert('Receipt download coming soon')">Download Receipt 📄</button>
+          <button class="btn-ghost" style="flex:1" onclick="alert('WhatsApp share coming soon')">💬 Share on WhatsApp</button>
+        </div>
+        <button class="btn-primary" style="width:100%;margin-bottom:10px" onclick="showTracker()">📊 Track My Application →</button>
+        <button class="btn-ghost" style="width:100%" onclick="showScreen('dashboard-screen')">Go to Dashboard</button>
+      </div>
+    </div>
+  </div>
+</div>

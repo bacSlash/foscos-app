@@ -1,0 +1,1517 @@
+<script type="module">
+// ═══════════════════════════════════════════════════════════════
+//  FoSCoS — Citizen App JS Module
+//  Credentials are loaded from backend /api/config (never hardcoded)
+// ═══════════════════════════════════════════════════════════════
+
+import { initializeApp }           from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+import { getAuth, signInWithPhoneNumber, RecaptchaVerifier } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+import { getAnalytics }            from "https://www.gstatic.com/firebasejs/12.12.0/firebase-analytics.js";
+
+// ── App State ──────────────────────────────────────────────────
+const S = {
+  setup: [], menu: [], annual: null, tier: null, duration: 1,
+  details: {}, docs: {}, photos: {}, locationConfirmed: false,
+  cart: [], paymentIncomplete: false,
+  appId: null,
+  docRows: [],
+};
+
+const TLData = { name:'', mobile:'', pincode:'', area:'', bizName:'', bizType:'', geoTagged:false, docs:{} };
+
+let _currentRole   = 'fbo';
+let _loginRole     = 'fbo';
+let _fboMode       = false;
+let _tlPurpose     = 'stall';
+let _tlEligSetup   = '';
+let _tlEligFoods   = [];
+let _selectedPayMethod = null;
+let dbUser         = null;
+let _currentAppId  = null;
+let _realtimeChannel = null;
+let _dailyCustomers  = 50;
+let _avgSpend        = 150;
+let _confirmationResult = null;
+let _tlConfirmationResult = null;
+let _agentConfirmationResult = null;
+let _currentCC_FBO = null;
+let hasTempLicense = false;
+
+let auth, supabaseClient;
+
+// ── Sample / Fixture Data (used when DB unavailable) ──────────
+const CC_FBOS = [
+  { id:'fbo-001', name:'Annapurna Catering',    type:'Restaurant',   loc:'Laitumkhrah, Shillong', emoji:'🍽️', fssai:'2026 0303 1083 8642', cat:'State License',       compliance:'High',   expiry:'2027-03-12' },
+  { id:'fbo-002', name:'Raj Snacks Corner',     type:'Snack Stall',  loc:'Police Bazar, Shillong',emoji:'🥙', fssai:'2024 1201 5842 1109', cat:'Basic Registration',  compliance:'Medium', expiry:'2026-12-01' },
+  { id:'fbo-003', name:'Meera Tiffin Service',  type:'Tiffin Centre',loc:'Mawlai, Shillong',      emoji:'🍱', fssai:'2025 0606 2291 4403', cat:'State License',       compliance:'High',   expiry:'2027-06-06' },
+  { id:'fbo-004', name:'Fresh Juice Hub',       type:'Juice Bar',    loc:'Nongthymmai, Shillong',  emoji:'🥤', fssai:'2025 1104 3318 2201', cat:'Basic Registration',  compliance:'High',   expiry:'2027-11-04' },
+];
+
+const PINCODE_MAP = {
+  '793001':{ area:'Laitumkhrah',    city:'Shillong',   state:'Meghalaya',    district:'East Khasi Hills' },
+  '793002':{ area:'Mawlai',         city:'Shillong',   state:'Meghalaya',    district:'East Khasi Hills' },
+  '793004':{ area:'Nongthymmai',    city:'Shillong',   state:'Meghalaya',    district:'East Khasi Hills' },
+  '793008':{ area:'Rynjah',         city:'Shillong',   state:'Meghalaya',    district:'East Khasi Hills' },
+  '110001':{ area:'Connaught Place',city:'New Delhi',  state:'Delhi',        district:'Central Delhi' },
+  '110002':{ area:'Daryaganj',      city:'New Delhi',  state:'Delhi',        district:'Central Delhi' },
+  '400001':{ area:'Fort',           city:'Mumbai',     state:'Maharashtra',  district:'Mumbai City' },
+  '400051':{ area:'Bandra West',    city:'Mumbai',     state:'Maharashtra',  district:'Mumbai Suburban' },
+  '560001':{ area:'Cubbon Park',    city:'Bangalore',  state:'Karnataka',    district:'Bangalore Urban' },
+  '600001':{ area:'Parrys',         city:'Chennai',    state:'Tamil Nadu',   district:'Chennai' },
+  '700001':{ area:'BBD Bagh',       city:'Kolkata',    state:'West Bengal',  district:'Kolkata' },
+  '500001':{ area:'Hyderabad Old City',city:'Hyderabad',state:'Telangana',   district:'Hyderabad' },
+  '302001':{ area:'MI Road',        city:'Jaipur',     state:'Rajasthan',    district:'Jaipur' },
+  '380001':{ area:'Lal Darwaja',    city:'Ahmedabad',  state:'Gujarat',      district:'Ahmedabad' },
+  '411001':{ area:'Shivajinagar',   city:'Pune',       state:'Maharashtra',  district:'Pune' },
+  '226001':{ area:'Hazratganj',     city:'Lucknow',    state:'Uttar Pradesh',district:'Lucknow' },
+  '695001':{ area:'East Fort',      city:'Thiruvananthapuram',state:'Kerala',district:'Thiruvananthapuram' },
+};
+
+const POTATO_REPLIES = {
+  'license':  'For basic registration (under ₹12L turnover) the fee is ₹100/year. State License (₹12L-20Cr) is ₹2,000-5,000/yr. Central License (above ₹20Cr) is ₹7,500/yr. 🥔',
+  'fee':      'Basic Registration: ₹100/yr · State License: ₹2,000–₹5,000/yr · Central License: ₹7,500/yr. Duration discounts available for 2 or 5 year licenses!',
+  'documents':'For Basic Registration you need: Photo ID (Aadhaar/PAN/Passport), Address Proof, and a List of Food Items. State/Central licenses require additional lab reports and premises documents.',
+  'time':     'Basic Registration is approved within 30 days. Instant Temp License is issued same day! State/Central licenses take 60–90 days.',
+  'temp':     'Instant Temporary License is for businesses with turnover under ₹12 Lakh. Valid 30 days (events/stalls) or 60 days (businesses). Apply with just 2 documents!',
+  'renew':    'You can renew your license up to 30 days before expiry. Go to Dashboard → My License → Renew. Annual Return filing is also required by 31 May each year.',
+  'fostac':   'FoSTaC (Food Safety Training and Certification) is mandatory for food handlers. Free online course available on the FoSCoS portal — takes about 2 hours to complete.',
+  'penalty':  'Operating without a license can result in a fine of ₹5 lakh or more under the FSS Act 2006. Always keep your license valid!',
+  'annual':   'Annual Returns must be filed by 31 May every year. Log in to your dashboard and click "Annual Return" to complete the form online.',
+  'oss':      'One Stop Shop is where you can book NABL lab testing, get FoSTaC training, order hygiene supplies, and book FSM consultations — all in one place!',
+  'default':  'I didn\'t quite catch that. Try asking about: license fees, documents, processing time, temp licenses, renewals, FoSTaC, or One Stop Shop. 🥔',
+};
+
+const TIER_CONFIG = {
+  basic:   { label:'Basic Registration', fee:100,  minTurnover:0,         maxTurnover:12 },
+  state:   { label:'State License',      fee:2000, minTurnover:12,        maxTurnover:2000 },
+  central: { label:'Central License',    fee:7500, minTurnover:2000,      maxTurnover:Infinity },
+};
+
+// ── Firebase & Supabase bootstrap ─────────────────────────────
+async function initServices() {
+  try {
+    const res = await fetch('/api/config');
+    if (!res.ok) throw new Error('Config fetch failed');
+    const cfg = await res.json();
+
+    const fbApp = initializeApp(cfg.firebase);
+    auth = getAuth(fbApp);
+    try { getAnalytics(fbApp); } catch(_) {}
+
+    supabaseClient = window.supabase.createClient(cfg.supabase.url, cfg.supabase.anon_key);
+  } catch (e) {
+    console.warn('Running in offline/mock mode:', e.message);
+    auth = null;
+    supabaseClient = null;
+  }
+}
+
+// ── Auth helper ────────────────────────────────────────────────
+async function authFetch(url, opts = {}) {
+  const token = localStorage.getItem('foscos_token');
+  if (!opts.headers) opts.headers = {};
+  if (token) opts.headers['Authorization'] = 'Bearer ' + token;
+  const res = await fetch(url, opts);
+  return res;
+}
+
+// ── Navigation ─────────────────────────────────────────────────
+const FLOW_SCREENS = new Set([
+  'q-setup-screen','q-menu-screen','q-turnover-screen',
+  'details-screen','documents-screen','one-stop-screen',
+  'review-screen','payment-options-screen','payment-screen',
+]);
+
+const TL_SCREENS = new Set([
+  'tl-s1','tl-purpose','tl-s2','tl-s3','tl-s4','tl-s5','tl-s6','tl-s7','tl-s8',
+]);
+
+// Screens that get their own bookmarkable URL
+const SCREEN_TO_URL = {
+  'home-screen':      '/',
+  'login-screen':     '/login',
+  'dashboard-screen': '/dashboard',
+  'tracker-screen':   '/track',
+  'setup-screen':     '/apply',
+  'cc-search':        '/consumer',
+  'agent-dashboard':  '/agent',
+  'tl-s1':            '/temp-license',
+  'my-tl-screen':     '/my-licenses',
+};
+const URL_TO_SCREEN = Object.fromEntries(
+  Object.entries(SCREEN_TO_URL).map(([k, v]) => [v, k])
+);
+
+// fromPopstate=true skips pushState (browser already handled it)
+function showScreen(id, fromPopstate) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById(id);
+  if (target) { target.classList.add('active'); window.scrollTo(0,0); }
+
+  // Progress bars visibility
+  const pb = document.getElementById('progress-bar');
+  const tl = document.getElementById('tl-progress-bar');
+  if (pb) pb.classList.toggle('visible', FLOW_SCREENS.has(id));
+  if (tl) tl.style.display = TL_SCREENS.has(id) ? 'block' : 'none';
+
+  // Update Potato chips
+  updatePotatoChips(id);
+
+  // Close Potato if open
+  const pw = document.getElementById('potato-window');
+  if (pw) pw.classList.remove('open');
+
+  // Auto-load data
+  if (id === 'dashboard-screen') loadDashboard();
+  if (id === 'tracker-screen')   showTracker();
+  if (id === 'agent-dashboard')  loadAgentDashboard();
+  if (id === 'cc-track')         loadMyGrievances();
+  if (id === 'cc-search')        setTimeout(() => renderCCResults(CC_FBOS, '📍 Businesses Near You'), 80);
+  if (id === 'review-screen')    renderReview();
+
+  // Update browser URL if this screen has a mapped path
+  if (!fromPopstate) {
+    const url = SCREEN_TO_URL[id];
+    if (url && window.location.pathname !== url) {
+      history.pushState({ screen: id }, '', url);
+    }
+  }
+}
+
+// Back/forward button support
+window.addEventListener('popstate', e => {
+  const screen = e.state?.screen;
+  if (screen) showScreen(screen, true);
+});
+
+function goFlow(id, step) {
+  showScreen(id);
+  updateProgress(step);
+}
+
+function updateProgress(n) {
+  for (let i = 0; i < 4; i++) {
+    const item = document.getElementById('prog-' + i);
+    const line = document.getElementById('prog-line-' + i);
+    if (!item) continue;
+    item.classList.remove('active','done');
+    if (i < n) item.classList.add('done');
+    else if (i === n) item.classList.add('active');
+    if (line) line.style.background = i < n ? 'var(--sage)' : 'var(--border)';
+  }
+}
+
+function tlGo(step) {
+  const map = { 0:'tl-s1', 1:'tl-purpose', 2:'tl-s2', 3:'tl-s3', 4:'tl-s4', 5:'tl-s5', 6:'tl-s6', 7:'tl-s7', 8:'tl-s8' };
+  if (map[step]) showScreen(map[step]);
+  tlSetProgress(step);
+}
+
+function tlSetProgress(n) {
+  for (let i = 0; i <= 8; i++) {
+    const el = document.getElementById('tl-prog-' + i);
+    if (!el) continue;
+    el.classList.remove('active','done');
+    if (i < n) el.classList.add('done');
+    else if (i === n) el.classList.add('active');
+  }
+}
+
+function tlShowBar()  { const b = document.getElementById('tl-progress-bar'); if (b) b.style.display = 'block'; }
+function tlHideBar()  { const b = document.getElementById('tl-progress-bar'); if (b) b.style.display = 'none';  }
+
+function openGatewayModal()            { const m = document.getElementById('gateway-modal'); if (m) m.classList.add('active'); }
+function closeGatewayModal()           { const m = document.getElementById('gateway-modal'); if (m) m.classList.remove('active'); }
+function closeGatewayModalBg(e)        { if (e.target.id === 'gateway-modal') closeGatewayModal(); }
+function startFBOGateway()             { _fboMode = true; showScreen('fbo-login-screen'); }
+function startFBOFlow()                { goFlow('q-setup-screen', 0); }
+function startTempLicense()            { showScreen('tl-s1'); tlShowBar(); tlSetProgress(0); }
+function openOneStopShop()             { showScreen('one-stop-screen'); ossTab('kit', null); }
+
+function showTracker() {
+  showScreen('tracker-screen');
+  if (_currentAppId) loadTrackerFromDB(_currentAppId);
+}
+
+// ── Firebase OTP — FBO ─────────────────────────────────────────
+function goToFBOOTP() {
+  const mobile = document.getElementById('fbo-login-mobile')?.value.trim();
+  if (!mobile || mobile.length !== 10) { alert('Please enter a valid 10-digit mobile number.'); return; }
+
+  const disp = document.getElementById('fbo-otp-mobile-display');
+  if (disp) disp.textContent = mobile;
+
+  if (!auth) {
+    // Mock mode — skip OTP
+    showScreen('fbo-otp-screen');
+    return;
+  }
+  try {
+    const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' });
+    signInWithPhoneNumber(auth, '+91' + mobile, verifier)
+      .then(result => { _confirmationResult = result; showScreen('fbo-otp-screen'); })
+      .catch(err => { alert('OTP send failed: ' + err.message); verifier.clear(); });
+  } catch(e) { showScreen('fbo-otp-screen'); }
+}
+
+async function verifyFBOOTP() {
+  const otp = ['fo1','fo2','fo3','fo4','fo5'].map(id => document.getElementById(id)?.value || '').join('');
+  const status = document.getElementById('fbo-otp-status');
+
+  const proceed = async (idToken) => {
+    try {
+      const res = await authFetch('/api/auth/verify', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ id_token: idToken || 'mock_token', role: 'fbo' }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        dbUser = data.user;
+        localStorage.setItem('foscos_token', data.token || idToken || 'mock_token');
+        localStorage.setItem('foscos_user', JSON.stringify(dbUser));
+      }
+    } catch(_) {}
+    if (status) { status.textContent = '✅ Verified!'; status.style.color = 'var(--sage)'; }
+    setTimeout(() => showScreen('license-choice-screen'), 600);
+  };
+
+  if (!_confirmationResult || !auth) { await proceed(null); return; }
+
+  if (otp.length < 5) { if (status) { status.textContent = '❌ Enter all digits.'; status.style.color = 'var(--red)'; } return; }
+
+  try {
+    const credential = await _confirmationResult.confirm(otp);
+    const idToken = await credential.user.getIdToken();
+    await proceed(idToken);
+  } catch(e) {
+    if (status) { status.textContent = '❌ Invalid OTP. Try again.'; status.style.color = 'var(--red)'; }
+  }
+}
+
+// ── Generic Login OTP ──────────────────────────────────────────
+function selectLoginRole(role, el) {
+  _loginRole = role;
+  document.querySelectorAll('#login-role-step .sel-card').forEach(c => c.classList.remove('selected'));
+  if (el) el.classList.add('selected');
+  const step = document.getElementById('login-mobile-step');
+  if (step) step.style.display = 'block';
+}
+
+async function sendLoginOTP() {
+  const mobile = document.getElementById('login-mobile')?.value.trim();
+  if (!mobile || mobile.length !== 10) { alert('Enter a valid 10-digit number.'); return; }
+  const disp = document.getElementById('login-otp-mobile-display');
+  if (disp) disp.textContent = mobile;
+
+  // Build OTP boxes dynamically
+  const row = document.getElementById('login-otp-row');
+  if (row) {
+    row.innerHTML = '';
+    const count = 6;
+    for (let i = 1; i <= count; i++) {
+      const inp = document.createElement('input');
+      inp.className = 'otp-box'; inp.type = 'tel'; inp.maxLength = 1; inp.id = 'lo' + i;
+      inp.setAttribute('oninput', `otpAdvance(this,'lo${i < count ? i+1 : ''}')`);
+      inp.setAttribute('onkeydown', `otpBack(event,this,'${i > 1 ? 'lo'+(i-1) : ''}')`);
+      row.appendChild(inp);
+    }
+  }
+  const lenLabel = document.getElementById('login-otp-length-label');
+  if (lenLabel) lenLabel.textContent = '6';
+
+  if (!auth) { showScreen('otp-screen'); return; }
+  try {
+    const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', { size:'invisible' });
+    const result = await signInWithPhoneNumber(auth, '+91' + mobile, verifier);
+    _confirmationResult = result;
+  } catch(e) { console.warn('OTP send:', e.message); }
+  showScreen('otp-screen');
+}
+
+async function verifyLoginOTP() {
+  const otp = Array.from({length:6}, (_,i) => document.getElementById('lo' + (i+1))?.value || '').join('');
+  const err = document.getElementById('login-otp-error');
+
+  const proceed = async (idToken) => {
+    try {
+      const res = await authFetch('/api/auth/verify', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ id_token: idToken || 'mock_token', role: _loginRole }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        dbUser = data.user;
+        localStorage.setItem('foscos_token', data.token || 'mock_token');
+        localStorage.setItem('foscos_user', JSON.stringify(dbUser));
+      }
+    } catch(_) {}
+    if (_loginRole === 'agent')    showScreen('agent-dashboard');
+    else if (_loginRole === 'consumer') showScreen('cc-search');
+    else showScreen('dashboard-screen');
+  };
+
+  if (!_confirmationResult || !auth) { await proceed(null); return; }
+  if (otp.length < 6) { if (err) { err.textContent = '❌ Enter all 6 digits.'; err.style.display = 'block'; } return; }
+
+  try {
+    const cred = await _confirmationResult.confirm(otp);
+    const token = await cred.user.getIdToken();
+    if (err) err.style.display = 'none';
+    await proceed(token);
+  } catch(e) {
+    if (err) { err.textContent = '❌ Invalid OTP. Please try again.'; err.style.display = 'block'; }
+  }
+}
+
+// ── Temp License OTP ───────────────────────────────────────────
+async function sendTLOTP() {
+  const mobile = document.getElementById('tl-mobile')?.value.trim();
+  if (!mobile || mobile.length !== 10) { alert('Enter a valid 10-digit number.'); return; }
+  if (!auth) { showScreen('tl-s3'); return; }
+  try {
+    const verifier = new RecaptchaVerifier(auth, 'recaptcha-container-tl', { size:'invisible' });
+    _tlConfirmationResult = await signInWithPhoneNumber(auth, '+91' + mobile, verifier);
+  } catch(e) { console.warn(e); }
+  showScreen('tl-s3');
+}
+
+async function verifyTLOTP() {
+  const otp = ['tl1','tl2','tl3','tl4','tl5','tl6'].map(id => document.getElementById(id)?.value || '').join('');
+  if (!_tlConfirmationResult || !auth) { goFlow('details-screen', 1); return; }
+  try {
+    const cred = await _tlConfirmationResult.confirm(otp);
+    const token = await cred.user.getIdToken();
+    await authFetch('/api/auth/verify', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ id_token: token, role:'fbo' }),
+    });
+  } catch(e) {}
+  tlGo(3);
+}
+
+// ── Agent OTP ──────────────────────────────────────────────────
+async function sendAgentOTP() {
+  const mobile = document.getElementById('agent-mobile')?.value.trim();
+  if (!mobile || mobile.length !== 10) { alert('Enter a valid 10-digit number.'); return; }
+  if (!auth) { showScreen('agent-otp-screen'); return; }
+  try {
+    const verifier = new RecaptchaVerifier(auth, 'agent-recaptcha-container', { size:'invisible' });
+    _agentConfirmationResult = await signInWithPhoneNumber(auth, '+91' + mobile, verifier);
+  } catch(e) {}
+  showScreen('agent-otp-screen');
+}
+
+async function verifyAgentOTP() {
+  const otp = ['ao1','ao2','ao3','ao4','ao5','ao6'].map(id => document.getElementById(id)?.value || '').join('');
+  const proceed = async (token) => {
+    try {
+      const res = await authFetch('/api/auth/verify', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ id_token: token || 'mock_token', role:'agent' }),
+      });
+      if (res.ok) {
+        const d = await res.json();
+        dbUser = d.user;
+        localStorage.setItem('foscos_token', d.token || 'mock_token');
+        localStorage.setItem('foscos_user', JSON.stringify(dbUser));
+      }
+    } catch(_) {}
+    showScreen('agent-dashboard');
+  };
+  if (!_agentConfirmationResult || !auth) { await proceed(null); return; }
+  try { const cred = await _agentConfirmationResult.confirm(otp); await proceed(await cred.user.getIdToken()); }
+  catch(e) { alert('Invalid OTP'); }
+}
+
+// ── License Choice ─────────────────────────────────────────────
+function selectLicenseChoice(type, el) {
+  document.querySelectorAll('#license-choice-screen .sel-card').forEach(c => c.classList.remove('selected'));
+  if (el) el.classList.add('selected');
+  if (type === 'permanent') setTimeout(() => goFlow('q-setup-screen', 0), 300);
+  else setTimeout(() => startTempLicense(), 300);
+}
+
+// ── KOB / Food toggles ─────────────────────────────────────────
+function toggleKOB(el, kobCode) {
+  el.classList.toggle('selected');
+  if (el.classList.contains('selected')) { if (!S.setup.includes(kobCode)) S.setup.push(kobCode); }
+  else { S.setup = S.setup.filter(k => k !== kobCode); }
+  const btn = document.getElementById('kob-continue-btn');
+  if (btn) btn.disabled = S.setup.length === 0;
+}
+
+function toggleFood(el, key) {
+  el.classList.toggle('sel');
+  if (el.classList.contains('sel')) { if (!S.menu.includes(key)) S.menu.push(key); }
+  else { S.menu = S.menu.filter(k => k !== key); }
+}
+
+// ── Turnover Calculator ────────────────────────────────────────
+function adjustCounter(id, delta) {
+  if (id === 'daily-customers') {
+    _dailyCustomers = Math.max(1, _dailyCustomers + delta);
+    const el = document.getElementById('daily-customers-val');
+    if (el) el.textContent = _dailyCustomers;
+  } else {
+    _avgSpend = Math.max(10, _avgSpend + delta);
+    const el = document.getElementById('avg-spend-val');
+    if (el) el.textContent = '₹' + _avgSpend;
+  }
+}
+
+function calcTurnover() {
+  const annual = _dailyCustomers * _avgSpend * 365;
+  const lakh = annual / 100000;
+  const cr   = lakh / 100;
+
+  let tier;
+  if (lakh < 12)      tier = { ...TIER_CONFIG.basic,   key:'basic'   };
+  else if (cr < 20)   tier = { ...TIER_CONFIG.state,   key:'state'   };
+  else                tier = { ...TIER_CONFIG.central, key:'central' };
+
+  S.annual = annual;
+  S.tier   = tier;
+
+  const resEl = document.getElementById('turnover-result');
+  if (resEl) {
+    resEl.style.display = 'block';
+    const amtEl = document.getElementById('turnover-result-amount');
+    if (amtEl) amtEl.textContent = lakh < 100 ? `₹${lakh.toFixed(1)} Lakh/yr` : `₹${cr.toFixed(1)} Crore/yr`;
+    const tierEl = document.getElementById('turnover-result-tier');
+    if (tierEl) {
+      tierEl.textContent = tier.label;
+      tierEl.className = tier.key === 'basic' ? 'badge-active' : tier.key === 'state' ? 'badge-pending' : 'badge-flagged';
+    }
+    const feeEl = document.getElementById('turnover-result-fee');
+    if (feeEl) feeEl.textContent = '₹' + tier.fee.toLocaleString('en-IN') + '/year';
+  }
+
+  const hint = document.getElementById('temp-hint');
+  if (hint) hint.style.display = lakh < 12 ? 'block' : 'none';
+
+  const btn = document.getElementById('turnover-continue-btn');
+  if (btn) btn.disabled = false;
+}
+
+function proceedFromTurnover() {
+  goFlow('details-screen', 1);
+}
+
+// ── Details Screen ─────────────────────────────────────────────
+function onIDTypeChange(type) {
+  const row = document.getElementById('d-id-number-row');
+  const lbl = document.getElementById('d-id-number-label');
+  const inp = document.getElementById('d-id-number');
+  if (!row || !lbl || !inp) return;
+  const config = {
+    aadhaar:   { label:'Aadhaar Number', max:12, ph:'12-digit Aadhaar number' },
+    pan:       { label:'PAN Number',     max:10, ph:'10-character PAN (e.g. ABCDE1234F)' },
+    passport:  { label:'Passport Number',max:8,  ph:'Passport number' },
+    voter:     { label:'Voter ID Number',max:10, ph:'Voter ID number' },
+    driving:   { label:'Driving Licence',max:16, ph:'DL number' },
+  };
+  const c = config[type] || config.aadhaar;
+  lbl.textContent = c.label;
+  inp.maxLength   = c.max;
+  inp.placeholder = c.ph;
+  row.style.display = 'block';
+}
+
+function onPincodeInput(el) {
+  if (el.value.length !== 6) return;
+  const d = PINCODE_MAP[el.value];
+  if (!d) return;
+  const stateEl = document.getElementById('d-state');
+  const distEl  = document.getElementById('d-district');
+  const areaEl  = document.getElementById('d-area');
+  if (stateEl) stateEl.value = d.state;
+  if (distEl)  distEl.value  = d.district;
+  if (areaEl && !areaEl.value) areaEl.value = d.area;
+}
+
+function setDurationFromSelect(yr) {
+  S.duration = parseInt(yr) || 1;
+  updateFee();
+}
+
+function updateFee() {
+  if (!S.tier) return;
+  const total = S.tier.fee * S.duration;
+  const el = document.getElementById('fee-total');
+  if (el) el.textContent = '₹' + total.toLocaleString('en-IN');
+}
+
+async function validateAndGoDocuments() {
+  const required = ['d-biz-name','d-biz-type','d-pincode','d-state'];
+  let ok = true;
+  required.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && !el.value.trim()) { el.classList.add('error'); ok = false; }
+    else if (el) el.classList.remove('error');
+  });
+  if (!ok) { alert('Please fill all required fields.'); return; }
+  await createApplication();
+  goFlow('documents-screen', 2);
+}
+
+async function createApplication() {
+  const bizName = document.getElementById('d-biz-name')?.value.trim() || 'My Business';
+  const payload = {
+    business_name: bizName,
+    business_type: document.getElementById('d-biz-type')?.value || '',
+    license_type:  S.tier?.key || 'basic',
+    annual_turnover: S.annual || 0,
+    duration_years:  S.duration,
+    fee_amount:      (S.tier?.fee || 100) * S.duration,
+    details: JSON.stringify(S.details),
+    kob_codes: S.setup.join(','),
+    food_categories: S.menu.join(','),
+  };
+
+  try {
+    const res = await authFetch('/api/applications', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      _currentAppId = data.id;
+      S.appId  = data.id;
+      S.docRows = data.documents || [];
+    }
+  } catch(_) {}
+
+  // Fallback sample doc rows if DB unavailable
+  if (!S.docRows.length) {
+    S.docRows = [
+      { id:'doc-1', doc_key:'photo_id',     doc_label:'Photo Identity Proof',       status:'pending', officer_note:'' },
+      { id:'doc-2', doc_key:'address_proof',doc_label:'Address / Premises Proof',   status:'pending', officer_note:'' },
+      { id:'doc-3', doc_key:'food_list',    doc_label:'List of Food Items',          status:'pending', officer_note:'' },
+      { id:'doc-4', doc_key:'premises_photo',doc_label:'Geotagged Premises Photo',  status:'pending', officer_note:'' },
+    ];
+    if (S.tier?.key !== 'basic') {
+      S.docRows.push({ id:'doc-5', doc_key:'lab_report', doc_label:'NABL Lab Water Test Report', status:'pending', officer_note:'' });
+    }
+  }
+  renderDocList();
+  if (_currentAppId) subscribeToDocumentUpdates(_currentAppId);
+}
+
+// ── Documents ──────────────────────────────────────────────────
+function renderDocList() {
+  const list = document.getElementById('doc-list');
+  if (!list || !S.docRows.length) return;
+  list.innerHTML = S.docRows.map(doc => `
+    <div class="doc-row" data-doc-id="${doc.id}">
+      <div class="doc-row-head" onclick="toggleDocRow(this)">
+        <div style="display:flex;align-items:center;gap:10px;flex:1;">
+          <span style="font-size:18px;">📄</span>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--navy);">${doc.doc_label}</div>
+            <span class="doc-status-badge ${doc.status === 'approved' ? 'badge-active' : doc.status === 'rejected' ? 'badge-flagged' : 'badge-pending'}" id="badge-${doc.id}">
+              ${doc.status === 'approved' ? '✅ Approved' : doc.status === 'rejected' ? '❌ Rejected' : doc.status === 'uploaded' ? '⏳ Uploaded — Pending Review' : '📎 Required'}
+            </span>
+          </div>
+        </div>
+        <span class="doc-row-arrow">▼</span>
+      </div>
+      <div class="doc-row-body">
+        <div id="note-${doc.id}" class="banner banner-red" style="display:${doc.officer_note ? 'flex' : 'none'};margin-bottom:10px;">
+          <div class="banner-icon">⚠️</div><div style="font-size:13px;">${doc.officer_note || ''}</div>
+        </div>
+        <label class="btn-ghost btn-sm" style="cursor:pointer;display:inline-block;">
+          📎 Upload Document
+          <input type="file" style="display:none;" accept="image/*,application/pdf" onchange="uploadDoc('${doc.id}', this.files[0])"/>
+        </label>
+      </div>
+    </div>
+  `).join('');
+  updateDocProgress();
+}
+
+function toggleDocRow(headEl) {
+  headEl.closest('.doc-row').classList.toggle('open');
+}
+
+async function uploadDoc(docId, file) {
+  if (!file) return;
+  const badge = document.getElementById('badge-' + docId);
+  if (badge) { badge.textContent = '⏳ Uploading…'; badge.className = 'doc-status-badge badge-pending'; }
+
+  try {
+    const appId = _currentAppId || 'mock';
+    const fd = new FormData();
+    fd.append('file', file);
+    const res = await authFetch(`/api/applications/${appId}/documents/${docId}/upload`, { method:'POST', body: fd });
+    if (res.ok) {
+      if (badge) { badge.textContent = '⏳ Uploaded — Pending Review'; badge.className = 'doc-status-badge badge-pending'; }
+    }
+  } catch(_) {
+    if (badge) { badge.textContent = '⏳ Uploaded — Pending Review'; badge.className = 'doc-status-badge badge-pending'; }
+  }
+  updateDocProgress();
+}
+
+function uploadPhoto(type, input) {
+  if (!input.files || !input.files[0]) return;
+  S.photos[type] = true;
+  const box = document.getElementById('photo-' + type + '-box');
+  if (box) {
+    box.innerHTML = `<div style="font-size:28px;margin-bottom:6px;">✅</div><div style="font-size:13px;font-weight:600;color:var(--sageDk);">Photo uploaded</div>`;
+    box.style.borderColor = 'var(--sage)';
+  }
+  const banner = document.getElementById('geo-confirm');
+  if (banner) banner.style.display = 'flex';
+}
+
+function confirmLocation()     { S.locationConfirmed = true; const b = document.getElementById('geo-confirm'); if(b) b.innerHTML = '<div class="banner-icon">✅</div><div>Location confirmed — GPS coordinates saved.</div>'; }
+function editLocation()        { const b = document.getElementById('geo-edit-form'); if(b) b.style.display = 'block'; }
+function saveManualLocation()  { S.locationConfirmed = true; const b = document.getElementById('geo-edit-form'); if(b) b.style.display = 'none'; }
+
+function updateDocProgress() {
+  const uploaded = S.docRows.filter(d => d.status !== 'pending').length || 0;
+  const total    = S.docRows.length || 4;
+  const countEl  = document.getElementById('doc-count');
+  const fillEl   = document.getElementById('doc-progress-fill');
+  if (countEl) countEl.textContent = uploaded + ' / ' + total;
+  if (fillEl)  fillEl.style.width  = (total ? (uploaded / total * 100) : 0) + '%';
+}
+
+function subscribeToDocumentUpdates(appId) {
+  if (!supabaseClient || !appId) return;
+  if (_realtimeChannel) { supabaseClient.removeChannel(_realtimeChannel); }
+  _realtimeChannel = supabaseClient.channel('doc-updates-' + appId)
+    .on('postgres_changes', { event:'UPDATE', schema:'public', table:'documents', filter: `application_id=eq.${appId}` },
+      payload => updateDocumentStatusUI(payload.new.id, payload.new.status, payload.new.officer_note))
+    .subscribe();
+}
+
+function updateDocumentStatusUI(docId, status, note) {
+  const badge = document.getElementById('badge-' + docId);
+  if (badge) {
+    badge.textContent = status === 'approved' ? '✅ Approved' : status === 'rejected' ? '❌ Rejected — See note' : '⏳ Pending Review';
+    badge.className = 'doc-status-badge ' + (status === 'approved' ? 'badge-active' : status === 'rejected' ? 'badge-flagged' : 'badge-pending');
+  }
+  const noteEl = document.getElementById('note-' + docId);
+  if (noteEl) {
+    noteEl.style.display = note ? 'flex' : 'none';
+    noteEl.querySelector('div:last-child').textContent = note || '';
+  }
+  const row = S.docRows.find(d => d.id === docId);
+  if (row) { row.status = status; row.officer_note = note || ''; }
+  updateDocProgress();
+}
+
+// ── One Stop Shop ──────────────────────────────────────────────
+function ossTab(tab, btn) {
+  document.querySelectorAll('.oss-tab-rail .oss-tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.oss-pane').forEach(p => p.style.display = 'none');
+  if (btn) btn.classList.add('active');
+  const pane = document.getElementById('oss-' + tab);
+  if (pane) pane.style.display = 'block';
+}
+
+function bookLab(i) {
+  const el = document.getElementById('lab-' + i);
+  if (!el) return;
+  el.classList.add('booked');
+  const btn = el.querySelector('.lab-book-btn');
+  if (btn) { btn.textContent = '✅ Booked'; btn.disabled = true; }
+}
+
+function ossAddCart(name, price) {
+  S.cart.push({ name, price });
+  updateOSSCart();
+}
+
+function updateOSSCart() {
+  const bar   = document.getElementById('oss-cart-bar');
+  const items = document.getElementById('oss-cart-items');
+  const total = document.getElementById('oss-cart-total');
+  if (!bar) return;
+  const sum = S.cart.reduce((a,b) => a + b.price, 0);
+  if (S.cart.length) {
+    bar.style.display = 'flex';
+    if (items) items.textContent = S.cart.map(c => c.name).join(', ');
+    if (total) total.textContent = '₹' + sum.toLocaleString('en-IN');
+  }
+}
+
+function ossDownloadManual() {
+  const btn = document.querySelector('[onclick="ossDownloadManual()"]');
+  if (!btn) return;
+  btn.textContent = '⏳ Downloading…';
+  setTimeout(() => btn.textContent = '✅ Downloaded', 1500);
+}
+
+// ── Review & Payment ───────────────────────────────────────────
+function renderReview() {
+  const fields = document.getElementById('review-fields');
+  if (fields && S.tier) {
+    fields.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div><div style="font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;">License Type</div><div style="font-size:14px;font-weight:700;color:var(--navy);margin-top:3px;">${S.tier.label}</div></div>
+        <div><div style="font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;">Duration</div><div style="font-size:14px;font-weight:700;color:var(--navy);margin-top:3px;">${S.duration} Year${S.duration > 1 ? 's' : ''}</div></div>
+        <div><div style="font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;">Business</div><div style="font-size:14px;font-weight:700;color:var(--navy);margin-top:3px;">${document.getElementById('d-biz-name')?.value || '—'}</div></div>
+        <div><div style="font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;">Activities</div><div style="font-size:14px;font-weight:700;color:var(--navy);margin-top:3px;">${S.setup.length} selected</div></div>
+      </div>`;
+  }
+  const feeRows = document.getElementById('review-fee-rows');
+  if (feeRows && S.tier) {
+    const base = S.tier.fee * S.duration;
+    feeRows.innerHTML = `
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px;"><span>${S.tier.label} (${S.duration} yr)</span><span>₹${base.toLocaleString('en-IN')}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:14px;color:var(--gray);"><span>Convenience Fee</span><span>₹0</span></div>`;
+  }
+  const grand = document.getElementById('review-grand-total');
+  if (grand && S.tier) grand.textContent = '₹' + (S.tier.fee * S.duration).toLocaleString('en-IN');
+  updatePaymentDisplay();
+}
+
+function previewApplication() {
+  const msg = document.getElementById('preview-msg');
+  if (msg) msg.style.display = 'block';
+}
+
+function selectPayment(method, el) {
+  document.querySelectorAll('.pay-card').forEach(c => c.classList.remove('selected'));
+  if (el) el.classList.add('selected');
+  _selectedPayMethod = method;
+}
+
+function proceedToPayment() {
+  if (!_selectedPayMethod) { alert('Please select a payment method.'); return; }
+  showScreen('payment-screen');
+  const bar = document.getElementById('payment-progress-bar');
+  const txt = document.getElementById('payment-status-text');
+  if (bar) { bar.style.width = '0%'; setTimeout(() => bar.style.transition = 'width 2.2s ease', 50); setTimeout(() => { bar.style.width = '100%'; }, 100); }
+  if (txt) txt.textContent = 'Processing payment…';
+  setTimeout(() => {
+    const success = document.getElementById('payment-success');
+    if (success) success.style.display = 'block';
+    if (txt) txt.textContent = 'Payment successful!';
+    const appIdEl = document.getElementById('success-app-id');
+    if (appIdEl) appIdEl.textContent = _currentAppId || 'FSSAI-2026-' + Math.floor(10000 + Math.random()*90000);
+    const ltEl = document.getElementById('success-license-type');
+    if (ltEl) ltEl.textContent = S.tier?.label || 'Basic Registration';
+    const amtEl = document.getElementById('success-amount');
+    if (amtEl) amtEl.textContent = '₹' + ((S.tier?.fee || 100) * S.duration).toLocaleString('en-IN');
+  }, 2400);
+}
+
+function updatePaymentDisplay() {
+  const el = document.getElementById('payment-total-display');
+  if (el && S.tier) el.textContent = '₹' + (S.tier.fee * S.duration).toLocaleString('en-IN');
+}
+
+// ── Dashboard ──────────────────────────────────────────────────
+async function loadDashboard() {
+  try {
+    const res = await authFetch('/api/dashboard');
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    if (data.licenses && data.licenses.length) {
+      const lic = data.licenses[0];
+      const nameEl = document.getElementById('dash-biz-name');
+      const numEl  = document.getElementById('dash-lic-number');
+      const expEl  = document.getElementById('dash-expiry');
+      if (nameEl) nameEl.textContent = lic.business_name || 'Your Business';
+      if (numEl)  numEl.textContent  = lic.fssai_number  || '—';
+      if (expEl)  expEl.textContent  = lic.expires_at    || '—';
+      const stateA = document.getElementById('dash-state-a');
+      const stateB = document.getElementById('dash-state-b');
+      if (stateA) stateA.style.display = 'block';
+      if (stateB) stateB.style.display = 'none';
+    }
+  } catch(_) {}
+
+  if (hasTempLicense) {
+    const tempCard = document.getElementById('dash-temp-card');
+    if (tempCard) tempCard.style.display = 'block';
+  }
+}
+
+function sidebarTab(tab, btn) {
+  document.querySelectorAll('.dash-sidebar-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.dash-sidebar-pane').forEach(p => p.style.display = 'none');
+  if (btn) btn.classList.add('active');
+  const pane = document.getElementById('sidebar-pane-' + tab);
+  if (pane) pane.style.display = 'block';
+}
+
+function enrollFoSTaC(type) {
+  if (type === 'basic') {
+    const msg = document.getElementById('fostac-enrolled-msg');
+    if (msg) msg.style.display = 'block';
+  } else {
+    const msg = document.getElementById('fostac-tracker-msg');
+    if (msg) msg.style.display = 'block';
+  }
+}
+
+// ── Tracker ────────────────────────────────────────────────────
+function switchTrackerTab(tab, btn) {
+  document.querySelectorAll('.tracker-tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tracker-pane').forEach(p => p.style.display = 'none');
+  if (btn) btn.classList.add('active');
+  const pane = document.getElementById('tracker-pane-' + tab);
+  if (pane) pane.style.display = 'block';
+}
+
+async function loadTrackerFromDB(appId) {
+  try {
+    const res = await authFetch('/api/applications/' + appId);
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    const list = document.getElementById('tracker-doc-list');
+    if (list && data.documents) {
+      list.innerHTML = data.documents.map(d => `
+        <div class="doc-row" data-doc-id="${d.id}">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);">
+            <div style="font-size:13px;color:var(--charcoal);">📄 ${d.doc_label || d.doc_key}</div>
+            <span class="doc-status-badge ${d.status === 'approved' ? 'badge-active' : d.status === 'rejected' ? 'badge-flagged' : 'badge-pending'}">
+              ${d.status === 'approved' ? '✅ Approved' : d.status === 'rejected' ? '❌ Rejected' : '⏳ Pending Review'}
+            </span>
+          </div>
+        </div>`).join('');
+    }
+  } catch(_) {}
+}
+
+// ── Temp License Flow ──────────────────────────────────────────
+function tlSelectSetup(type, el) {
+  _tlEligSetup = type;
+  document.querySelectorAll('#tl-s1 .sel-card').forEach(c => c.classList.remove('selected'));
+  if (el) el.classList.add('selected');
+  const turnoverQ = document.getElementById('tl-turnover-q');
+  const foodQ     = document.getElementById('tl-food-q');
+  if (turnoverQ) turnoverQ.style.display = type === 'permanent' ? 'block' : 'none';
+  if (foodQ)     foodQ.style.display     = type !== 'permanent' ? 'block' : 'none';
+}
+
+function tlSelectTurnover(type, el) {
+  document.querySelectorAll('#tl-turnover-q .sel-card').forEach(c => c.classList.remove('selected'));
+  if (el) el.classList.add('selected');
+  TLData.turnover = type;
+}
+
+function toggleTLFood(el, key) {
+  el.classList.toggle('selected');
+  if (el.classList.contains('selected')) { if (!_tlEligFoods.includes(key)) _tlEligFoods.push(key); }
+  else { _tlEligFoods = _tlEligFoods.filter(k => k !== key); }
+}
+
+const HIGH_RISK_FOODS = ['meat','fish','dairy_processed','ice_cream'];
+function tlHighRisk(el) {
+  el.style.border = '2px solid var(--red)';
+  setTimeout(() => { el.style.border = ''; }, 1000);
+  const tooltip = el.querySelector('.tl-risk-tooltip');
+  if (tooltip) { tooltip.style.display = 'block'; setTimeout(() => tooltip.style.display = 'none', 2500); }
+}
+
+function tlCheckEligibility() {
+  const hasHighRisk = _tlEligFoods.some(f => HIGH_RISK_FOODS.includes(f));
+  const ineligibleTurnover = TLData.turnover === '12to20' || TLData.turnover === 'above20';
+
+  const eligible   = document.getElementById('tl-eligible');
+  const ineligible = document.getElementById('tl-ineligible');
+
+  if (hasHighRisk || ineligibleTurnover) {
+    if (ineligible) ineligible.style.display = 'block';
+    if (eligible)   eligible.style.display   = 'none';
+  } else {
+    if (eligible)   eligible.style.display   = 'block';
+    if (ineligible) ineligible.style.display = 'none';
+    setTimeout(() => showScreen('tl-purpose'), 1500);
+  }
+}
+
+function tlSelectPurpose(type, el) {
+  _tlPurpose = type;
+  document.querySelectorAll('#tl-purpose .sel-card').forEach(c => c.classList.remove('selected'));
+  if (el) el.classList.add('selected');
+  const btn = document.getElementById('tl-purpose-btn');
+  if (btn) btn.disabled = false;
+}
+
+function tlValidateAndGo(step) {
+  const fieldsMap = {
+    3: ['tl-name', 'tl-mobile-disp'],
+    4: [],
+    5: ['tl-id-number'],
+    6: [],
+  };
+  const fields = fieldsMap[step] || [];
+  let ok = true;
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && !el.value?.trim()) { el.classList.add('error'); ok = false; }
+    else if (el) el.classList.remove('error');
+  });
+  if (!ok) { alert('Please fill all required fields.'); return; }
+  tlGo(step);
+}
+
+function tlUploadPhoto(num, input) {
+  if (!input.files || !input.files[0]) return;
+  const box = document.getElementById('tl-photo-' + num);
+  if (box) {
+    box.innerHTML = `<div style="font-size:24px;margin-bottom:4px;">✅</div><div style="font-size:12px;color:var(--sageDk);font-weight:600;">Photo ${num} uploaded</div>`;
+    box.style.borderColor = 'var(--sage)';
+  }
+  const countEl = document.getElementById('tl-photo-count');
+  if (countEl) {
+    const count = parseInt(countEl.textContent) + 1;
+    countEl.textContent = count;
+  }
+  TLData.geoTagged = true;
+}
+
+function tlUploadDoc(num, input) {
+  if (!input.files || !input.files[0]) return;
+  const badge = document.getElementById('tl-doc-badge-' + num);
+  if (badge) { badge.textContent = '✅ Uploaded'; badge.style.background = 'var(--sageLt)'; badge.style.color = 'var(--sageDk)'; }
+  const countEl = document.getElementById('tl-doc-count');
+  if (countEl) countEl.textContent = parseInt(countEl.textContent || '0') + 1;
+}
+
+function tlProceedAfterDisclaimer() {
+  const checkboxes = document.querySelectorAll('#tl-s6 .tl-disclaimer-check');
+  let allChecked = true;
+  checkboxes.forEach(cb => { if (!cb.checked) allChecked = false; });
+  if (!allChecked) { alert('Please agree to all terms before proceeding.'); return; }
+
+  // Generate TL license
+  const year = new Date().getFullYear();
+  const num  = String(Math.floor(10000 + Math.random() * 90000));
+  const licNum = `TL-${year}-${num}`;
+
+  const validDays = _tlPurpose === 'stall' ? 30 : 60;
+  const expiry    = new Date();
+  expiry.setDate(expiry.getDate() + validDays);
+
+  const licEl = document.getElementById('tl7-lic-number');
+  if (licEl) licEl.textContent = licNum;
+  const expEl = document.getElementById('tl7-expiry');
+  if (expEl)  expEl.textContent = expiry.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+  const typeEl = document.getElementById('tl7-lic-type');
+  if (typeEl)  typeEl.textContent = _tlPurpose === 'stall' ? 'Event / Stall License' : 'Temporary Business License';
+
+  const mytlEl = document.getElementById('mytl-number');
+  if (mytlEl) mytlEl.textContent = licNum;
+
+  tlGo(7);
+  startTLCountdown(expiry);
+}
+
+function startTLCountdown(expiryDate) {
+  function update() {
+    const diff = expiryDate - Date.now();
+    if (diff <= 0) { clearInterval(timer); return; }
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    const cdEl = document.getElementById('tl7-countdown');
+    if (cdEl) cdEl.textContent = `${d}d ${h}h ${m}m ${s}s`;
+    const daysEl = document.getElementById('mytl-days');
+    if (daysEl) daysEl.textContent = d + ' days left';
+  }
+  update();
+  const timer = setInterval(update, 1000);
+}
+
+function tlEnrollFostac() {
+  const msg = document.getElementById('tl8-enrolled-msg');
+  if (msg) msg.style.display = 'block';
+}
+
+function tlFinish() {
+  hasTempLicense = true;
+  showScreen('dashboard-screen');
+  const tempCard = document.getElementById('dash-temp-card');
+  if (tempCard) tempCard.style.display = 'block';
+}
+
+// ── Consumer Corner ────────────────────────────────────────────
+function renderCCResults(fbos, title) {
+  const titleEl = document.getElementById('cc-results-title');
+  const listEl  = document.getElementById('cc-results-list');
+  const notFound = document.getElementById('cc-not-found');
+  if (titleEl) titleEl.textContent = title;
+  if (notFound) notFound.style.display = 'none';
+
+  if (!listEl) return;
+  if (!fbos.length) {
+    listEl.innerHTML = '';
+    if (notFound) notFound.style.display = 'block';
+    return;
+  }
+
+  listEl.innerHTML = fbos.map(f => `
+    <div class="card card-hover" style="padding:16px;" onclick="ccOpenFBO('${f.id}')">
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <div style="width:48px;height:48px;border-radius:12px;background:var(--sageLt);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">${f.emoji}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:14px;font-weight:700;color:var(--navy);">${f.name}</div>
+          <div style="font-size:12px;color:var(--gray);margin-top:2px;">${f.type} · ${f.loc}</div>
+          <div style="font-size:11px;color:var(--gray);font-family:'DM Mono',monospace;margin-top:2px;">FSSAI: ${f.fssai}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;">
+          <span style="background:var(--sageLt);color:var(--sageDk);border-radius:99px;padding:3px 10px;font-size:11px;font-weight:700;">● Active</span>
+          <span style="font-size:11px;color:var(--gray);">${f.cat}</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function ccSearch(query) {
+  if (!query.trim()) {
+    renderCCResults(CC_FBOS, '📍 Businesses Near You');
+    return;
+  }
+  const q   = query.toLowerCase();
+  const res = CC_FBOS.filter(f => f.name.toLowerCase().includes(q) || f.loc.toLowerCase().includes(q) || f.type.toLowerCase().includes(q));
+  renderCCResults(res, res.length ? `🔍 Results for "${query}"` : '');
+}
+
+function ccOpenFBO(fboId) {
+  const fbo = CC_FBOS.find(f => f.id === fboId);
+  if (!fbo) return;
+  _currentCC_FBO = fbo;
+  const nameEl = document.getElementById('cc-fbo-card-name');
+  const licEl  = document.getElementById('cc-fbo-card-lic');
+  if (nameEl) nameEl.textContent = fbo.name;
+  if (licEl)  licEl.textContent  = `FSSAI: ${fbo.fssai} · ${fbo.cat}`;
+  showScreen('cc-grievance');
+}
+
+function ccUpdateRating() {
+  const premise = parseInt(document.getElementById('cc-r-premise')?.value || 3);
+  const food    = parseInt(document.getElementById('cc-r-food')?.value    || 3);
+  const hygiene = parseInt(document.getElementById('cc-r-hygiene')?.value || 3);
+
+  const labels = { 1:'1 ⭐', 2:'2 ⭐', 3:'3 ⭐', 4:'4 ⭐', 5:'5 ⭐' };
+  const pEl = document.getElementById('cc-r-premise-val');
+  const fEl = document.getElementById('cc-r-food-val');
+  const hEl = document.getElementById('cc-r-hygiene-val');
+  if (pEl) pEl.textContent = labels[premise];
+  if (fEl) fEl.textContent = labels[food];
+  if (hEl) hEl.textContent = labels[hygiene];
+
+  const overall = ((premise + food + hygiene) / 3).toFixed(1);
+  const oEl = document.getElementById('cc-overall-score');
+  if (oEl) oEl.textContent = overall + ' / 5';
+
+  const issueSection = document.getElementById('cc-issue-section');
+  if (issueSection) issueSection.style.display = (premise <= 2 || food <= 2 || hygiene <= 2) ? 'block' : 'none';
+}
+
+async function ccSubmitGrievance() {
+  const btn = document.getElementById('cc-submit-btn');
+  if (btn) { btn.textContent = 'Submitting…'; btn.disabled = true; }
+
+  const premise = parseInt(document.getElementById('cc-r-premise')?.value || 3);
+  const food    = parseInt(document.getElementById('cc-r-food')?.value    || 3);
+  const hygiene = parseInt(document.getElementById('cc-r-hygiene')?.value || 3);
+  const desc    = document.getElementById('cc-general-desc')?.value.trim()  || '';
+
+  const payload = {
+    fbo_name:   _currentCC_FBO?.name || 'Unknown FBO',
+    fbo_fssai:  _currentCC_FBO?.fssai || '',
+    premise_score:  premise,
+    food_score:     food,
+    hygiene_score:  hygiene,
+    overall_score:  parseFloat(((premise + food + hygiene) / 3).toFixed(1)),
+    description:    desc,
+  };
+
+  let complaintId = 'GRV-' + new Date().getFullYear() + '-' + String(Math.floor(10000 + Math.random()*90000));
+
+  try {
+    const res = await authFetch('/api/grievances', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload),
+    });
+    if (res.ok) { const d = await res.json(); complaintId = d.complaint_id || complaintId; }
+  } catch(_) {}
+
+  const idEl   = document.getElementById('cc-complaint-id');
+  const dateEl = document.getElementById('cc-filed-date');
+  if (idEl)   idEl.textContent   = complaintId;
+  if (dateEl) dateEl.textContent = new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+
+  if (btn) { btn.textContent = 'Submit Rating →'; btn.disabled = false; }
+  showScreen('cc-submit');
+}
+
+async function loadMyGrievances() {
+  try {
+    const res = await authFetch('/api/grievances/my');
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    if (data.grievances && data.grievances.length) {
+      const listEl = document.getElementById('cc-grievance-list');
+      if (listEl) {
+        listEl.innerHTML = data.grievances.map(g => `
+          <div class="card" style="padding:18px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+              <div>
+                <div style="font-size:14px;font-weight:700;color:var(--navy);">${g.issue || g.description || 'Complaint'}</div>
+                <div style="font-size:12px;color:var(--gray);margin-top:2px;">${g.fbo_name} · ${g.complaint_id}</div>
+              </div>
+              <span style="background:${g.status === 'resolved' ? 'var(--sageLt)' : 'var(--amberLt)'};color:${g.status === 'resolved' ? 'var(--sageDk)' : 'var(--amberDk)'};border-radius:99px;padding:3px 10px;font-size:11px;font-weight:700;">${g.status === 'resolved' ? '✅ Resolved' : '⏳ ' + g.status}</span>
+            </div>
+          </div>`).join('');
+      }
+    }
+  } catch(_) {}
+}
+
+function ccRepGPS() {
+  const locEl = document.getElementById('cc-rep-loc');
+  if (!locEl) return;
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(pos => {
+      locEl.value = `Lat: ${pos.coords.latitude.toFixed(5)}, Long: ${pos.coords.longitude.toFixed(5)}`;
+    }, () => { locEl.placeholder = 'GPS unavailable — type address'; });
+  }
+}
+
+function ccUploadEvidence() {
+  const input = document.createElement('input');
+  input.type  = 'file';
+  input.accept = 'image/*,video/*';
+  input.onchange = () => {
+    const ct = document.getElementById('cc-evidence-content');
+    if (ct && input.files[0]) {
+      ct.innerHTML = `<div style="font-size:28px;margin-bottom:6px;">✅</div><div style="font-size:13px;font-weight:600;color:var(--sageDk);">${input.files[0].name}</div>`;
+    }
+  };
+  input.click();
+}
+
+function ccUploadProof() {
+  const input = document.createElement('input');
+  input.type  = 'file';
+  input.accept = 'image/*,video/*';
+  input.onchange = () => {
+    const ct = document.getElementById('cc-rep-proof-content');
+    if (ct && input.files[0]) {
+      ct.innerHTML = `<div style="font-size:28px;margin-bottom:6px;">✅</div><div style="font-size:13px;font-weight:600;color:var(--sageDk);">${input.files[0].name}</div>`;
+    }
+  };
+  input.click();
+}
+
+async function ccSubmitReport() {
+  const loc  = document.getElementById('cc-rep-loc')?.value.trim();
+  const desc = document.getElementById('cc-rep-desc')?.value.trim();
+  if (!loc || !desc) { alert('Please fill in the location and description.'); return; }
+  alert('Report submitted. FSSAI officers will investigate within 72 hours. Thank you! 🙏');
+  showScreen('home-screen');
+}
+
+// ── Agent ──────────────────────────────────────────────────────
+async function loadAgentDashboard() {
+  try {
+    const res = await authFetch('/api/dashboard');
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    if (data.agent_clients && data.agent_clients.length) {
+      const listEl = document.getElementById('agent-client-list');
+      if (listEl) {
+        listEl.innerHTML = data.agent_clients.map(c => `
+          <div class="card card-hover" style="padding:18px;" onclick="agentOpenClient('${c.business_name}','${c.license_type || 'Basic Registration'}')">
+            <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+              <div style="width:44px;height:44px;border-radius:12px;background:var(--sageLt);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🏪</div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:14px;font-weight:700;color:var(--navy);">${c.business_name}</div>
+                <div style="font-size:12px;color:var(--gray);margin-top:2px;">${c.license_type || 'Basic Registration'}</div>
+              </div>
+              <button class="edit-btn" onclick="event.stopPropagation();agentOpenClient('${c.business_name}','${c.license_type || 'Basic Registration'}')">Manage →</button>
+            </div>
+          </div>`).join('');
+      }
+      const totEl = document.getElementById('agent-stat-total');
+      if (totEl) totEl.textContent = data.agent_clients.length;
+    }
+  } catch(_) {}
+}
+
+function agentOpenClient(bizName, licType) {
+  const nameEl  = document.getElementById('agent-client-name');
+  const bnameEl = document.getElementById('agent-client-bname');
+  const catEl   = document.getElementById('agent-client-cat');
+  const typeEl  = document.getElementById('agent-client-type');
+  const noteEl  = document.getElementById('agent-client-note');
+  if (nameEl)  nameEl.textContent  = bizName;
+  if (bnameEl) bnameEl.textContent = bizName;
+  if (catEl)   catEl.textContent   = 'FSSAI ' + (licType || 'State License');
+  if (typeEl)  typeEl.textContent  = licType || 'State License';
+  if (noteEl)  noteEl.textContent  = 'License expires soon. Initiate renewal at least 30 days before expiry.';
+  showScreen('agent-client-view');
+}
+
+function agentClientPath(type, el) {
+  document.querySelectorAll('#agent-add-client .sel-card').forEach(c => c.classList.remove('selected'));
+  if (el) el.classList.add('selected');
+  document.getElementById('agent-existing-path').style.display = type === 'existing' ? 'block' : 'none';
+  document.getElementById('agent-new-path').style.display      = type === 'new'      ? 'block' : 'none';
+}
+
+async function agentLinkClient() {
+  const mobile = document.getElementById('agent-link-mobile')?.value.trim();
+  if (!mobile || mobile.length !== 10) { alert('Enter a valid 10-digit number.'); return; }
+  const dispEl = document.getElementById('agent-claim-mobile-disp');
+  if (dispEl) dispEl.textContent = mobile;
+  showScreen('agent-claim-otp');
+}
+
+async function agentClaimVerify() {
+  const otp = ['ac1','ac2','ac3','ac4','ac5','ac6'].map(id => document.getElementById(id)?.value || '').join('');
+  if (otp.length < 6) { alert('Please enter all 6 digits.'); return; }
+  // Mock: any 6-digit OTP succeeds
+  const successEl = document.getElementById('agent-claim-success');
+  const otpCard   = successEl?.previousElementSibling;
+  if (otpCard) otpCard.style.display = 'none';
+  if (successEl) successEl.style.display = 'block';
+  const msgEl = document.getElementById('agent-claim-success-msg');
+  if (msgEl) msgEl.textContent = 'Client has been linked and added to your portfolio.';
+}
+
+async function agentCreateClient() {
+  const name   = document.getElementById('agent-nc-name')?.value.trim();
+  const biz    = document.getElementById('agent-nc-biz')?.value.trim();
+  const mobile = document.getElementById('agent-nc-mobile')?.value.trim();
+  const type   = document.getElementById('agent-nc-type')?.value;
+  if (!name || !biz || !mobile) { alert('Please fill all required fields.'); return; }
+
+  try {
+    await authFetch('/api/agent/clients', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ name, business_name: biz, mobile, business_type: type }),
+    });
+  } catch(_) {}
+
+  // Add to UI list optimistically
+  const listEl = document.getElementById('agent-client-list');
+  if (listEl) {
+    const item = document.createElement('div');
+    item.className = 'card card-hover';
+    item.style.padding = '18px';
+    item.onclick = () => agentOpenClient(biz, type || 'Basic Registration');
+    item.innerHTML = `
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div style="width:44px;height:44px;border-radius:12px;background:var(--sageLt);display:flex;align-items:center;justify-content:center;font-size:20px;">🏪</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:700;color:var(--navy);">${biz}</div>
+          <div style="font-size:12px;color:var(--gray);">${type || 'Food Business'} · +91${mobile}</div>
+        </div>
+        <span style="background:var(--amberLt);color:var(--amberDk);border-radius:99px;padding:4px 12px;font-size:11px;font-weight:700;">⏳ New</span>
+      </div>`;
+    listEl.prepend(item);
+  }
+  showScreen('agent-dashboard');
+}
+
+// ── Language toggle ────────────────────────────────────────────
+function setLang(lang, btn) {
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.querySelectorAll('[data-en]').forEach(el => {
+    el.textContent = lang === 'hi' ? (el.getAttribute('data-hi') || el.textContent) : el.getAttribute('data-en') || el.textContent;
+  });
+}
+
+// ── Potato Chatbot ─────────────────────────────────────────────
+function togglePotato() {
+  const pw = document.getElementById('potato-window');
+  if (pw) pw.classList.toggle('open');
+}
+
+function potatoSend(preset) {
+  const input = document.getElementById('potato-input');
+  const msgs  = document.getElementById('potato-msgs');
+  const msg   = preset || input?.value.trim();
+  if (!msg) return;
+
+  if (msgs) {
+    const userDiv = document.createElement('div');
+    userDiv.className = 'p-msg user';
+    userDiv.textContent = msg;
+    msgs.appendChild(userDiv);
+  }
+  if (input) input.value = '';
+
+  // Match reply
+  const lower = msg.toLowerCase();
+  let reply = POTATO_REPLIES.default;
+  for (const [key, val] of Object.entries(POTATO_REPLIES)) {
+    if (key !== 'default' && lower.includes(key)) { reply = val; break; }
+  }
+
+  setTimeout(() => {
+    if (msgs) {
+      const botDiv = document.createElement('div');
+      botDiv.className = 'p-msg bot';
+      botDiv.textContent = reply;
+      msgs.appendChild(botDiv);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+  }, 500);
+}
+
+function updatePotatoChips(screenId) {
+  const chips = document.getElementById('potato-chips');
+  if (!chips) return;
+  const chipSets = {
+    'home-screen':        [['What license do I need?','What license do I need?'], ['How long does it take?','How long does it take?'], ['What documents?','What documents are needed?'], ['What is the fee?','What is the fee?']],
+    'q-setup-screen':     [['What is KOB?','What is Kind of Business?'], ['How many can I select?','Can I select multiple KOBs?']],
+    'q-turnover-screen':  [['How to calculate turnover?','fee'], ['Which tier am I?','license']],
+    'documents-screen':   [['What documents are needed?','documents'], ['How to upload?','How do I upload documents?']],
+    'cc-search':          [['How to file complaint?','complaint'], ['Check license validity','check']],
+    'payment-screen':     [['Is payment secure?','Is the payment secure on FoSCoS?']],
+    'tl-s1':              [['What is temp license?','temp'], ['Who can apply?','Who is eligible for temp license?']],
+  };
+  const set = chipSets[screenId] || chipSets['home-screen'];
+  chips.innerHTML = set.map(([label, msg]) =>
+    `<button class="p-chip" onclick="potatoSend('${msg}')">${label}</button>`
+  ).join('');
+}
+
+// ── Text-to-Speech ─────────────────────────────────────────────
+function speak(text) {
+  if (window.speechSynthesis) window.speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+}
+
+// ── Stats animation ────────────────────────────────────────────
+function animateStats() {
+  const section = document.getElementById('stats-section');
+  if (!section) return;
+  const obs = new IntersectionObserver(entries => {
+    if (!entries[0].isIntersecting) return;
+    obs.disconnect();
+    document.querySelectorAll('.stat-count').forEach(el => {
+      const target = parseInt(el.getAttribute('data-target') || el.textContent.replace(/[^\d]/g,''));
+      let current  = 0;
+      const inc    = Math.ceil(target / 60);
+      const timer  = setInterval(() => {
+        current = Math.min(current + inc, target);
+        el.textContent = current.toLocaleString('en-IN') + (el.getAttribute('data-suffix') || '');
+        if (current >= target) clearInterval(timer);
+      }, 25);
+    });
+  }, { threshold: 0.3 });
+  obs.observe(section);
+}
+
+// ── Real-time clock ────────────────────────────────────────────
+function realTimeClock() {
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+  const dateStr = now.toLocaleDateString('en-IN', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+  document.querySelectorAll('[data-time]').forEach(el => el.textContent = timeStr);
+  document.querySelectorAll('[data-date]').forEach(el => el.textContent = dateStr);
+}
+
+// ── OTP helpers ────────────────────────────────────────────────
+function otpAdvance(el, nextId) {
+  if (el.value && nextId) {
+    const next = document.getElementById(nextId);
+    if (next) next.focus();
+  }
+}
+
+function otpBack(event, el, prevId) {
+  if (event.key === 'Backspace' && !el.value && prevId) {
+    const prev = document.getElementById(prevId);
+    if (prev) { prev.value = ''; prev.focus(); }
+  }
+}
+
+// ── Expose all functions to window (ES module requirement) ─────
+Object.assign(window, {
+  showScreen, goFlow, updateProgress, tlGo, tlSetProgress,
+  tlShowBar, tlHideBar, openGatewayModal, closeGatewayModal,
+  closeGatewayModalBg, startFBOGateway, startFBOFlow,
+  startTempLicense, openOneStopShop, showTracker,
+
+  goToFBOOTP, verifyFBOOTP,
+  sendLoginOTP, verifyLoginOTP,
+  sendTLOTP, verifyTLOTP,
+  sendAgentOTP, verifyAgentOTP,
+  selectLoginRole, authFetch,
+
+  selectLicenseChoice, toggleKOB, toggleFood,
+  adjustCounter, calcTurnover, proceedFromTurnover,
+  onIDTypeChange, onPincodeInput, setDurationFromSelect,
+  updateFee, validateAndGoDocuments, createApplication,
+
+  renderDocList, toggleDocRow, uploadDoc, uploadPhoto,
+  confirmLocation, editLocation, saveManualLocation,
+  updateDocProgress, subscribeToDocumentUpdates,
+  updateDocumentStatusUI,
+
+  ossTab, bookLab, ossAddCart, updateOSSCart, ossDownloadManual,
+
+  renderReview, previewApplication, selectPayment,
+  proceedToPayment, updatePaymentDisplay,
+
+  loadDashboard, sidebarTab, enrollFoSTaC,
+  switchTrackerTab, loadTrackerFromDB,
+
+  tlSelectSetup, tlSelectTurnover, toggleTLFood,
+  tlHighRisk, tlCheckEligibility, tlSelectPurpose,
+  tlValidateAndGo, tlUploadPhoto, tlUploadDoc,
+  tlProceedAfterDisclaimer, startTLCountdown,
+  tlEnrollFostac, tlFinish,
+
+  ccSearch, ccOpenFBO, ccUpdateRating, ccSubmitGrievance,
+  loadMyGrievances, ccRepGPS, ccUploadEvidence, ccUploadProof,
+  ccSubmitReport, renderCCResults,
+
+  agentCreateClient, loadAgentDashboard, agentOpenClient,
+  agentClientPath, agentLinkClient, agentClaimVerify,
+
+  setLang, speak, togglePotato, potatoSend, updatePotatoChips,
+  animateStats, realTimeClock, otpAdvance, otpBack,
+});
+
+// ── Boot ────────────────────────────────────────────────────────
+(async () => {
+  await initServices();
+
+  realTimeClock();
+  setInterval(realTimeClock, 1000);
+
+  animateStats();
+
+  // Restore session
+  const storedToken = localStorage.getItem('foscos_token');
+  const storedUser  = localStorage.getItem('foscos_user');
+  if (storedToken && storedUser) {
+    try { dbUser = JSON.parse(storedUser); } catch(_) {}
+  }
+
+  // Navigate to screen matching the current URL path
+  const urlPath = window.location.pathname;
+  const targetScreen = URL_TO_SCREEN[urlPath];
+  if (targetScreen && targetScreen !== 'home-screen') {
+    // Authenticated screens: redirect to login if no session
+    const authRequired = new Set(['dashboard-screen','tracker-screen','agent-dashboard','my-tl-screen']);
+    if (authRequired.has(targetScreen) && !storedToken) {
+      showScreen('home-screen', true);
+      setTimeout(openGatewayModal, 800);
+    } else {
+      showScreen(targetScreen, true);
+    }
+  } else {
+    // Default: home screen + gateway modal
+    showScreen('home-screen', true);
+    setTimeout(openGatewayModal, 800);
+  }
+})();
+</script>
+</body>
+</html>

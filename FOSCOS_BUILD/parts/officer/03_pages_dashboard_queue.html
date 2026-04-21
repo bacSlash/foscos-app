@@ -1,0 +1,218 @@
+<!-- ══════════════════════════════════════════════════════════════
+     PART 03 — DASHBOARD + MY QUEUE
+     ══════════════════════════════════════════════════════════════ -->
+
+<!-- ▌ DASHBOARD ▌ -->
+<div class="page active" id="page-dashboard">
+  <!-- Today's Action Items -->
+  <div style="background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;margin-bottom:16px;box-shadow:var(--s1);">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <div style="font-family:'DM Serif Display',serif;font-size:17px;color:var(--navy);">Today's Action Items</div>
+      <span style="font-size:11px;color:var(--g500);" id="dash-date-label"></span>
+      <button class="btn btn-ghost btn-sm" style="margin-left:auto;" onclick="navigate('myqueue')">View My Queue →</button>
+    </div>
+
+    <div class="triage-section">
+      <div class="triage-header">
+        <div class="triage-dot" style="background:var(--red)"></div>
+        <div class="triage-title" style="color:var(--red)">Urgent — Act Now</div>
+        <div class="triage-count" style="background:var(--redLt);color:var(--red)">3</div>
+      </div>
+      <div class="triage-item urgent" onclick="navigate('grievances')">
+        <div class="ti-ico">🚨</div>
+        <div style="flex:1">
+          <div class="ti-title">High-Priority Grievance — Star Spice Mill</div>
+          <div class="ti-sub">Consumer reported foreign material (plastic) in packaged spice. Batch SS-2024-021.</div>
+          <div class="ti-meta"><span class="badge b-red">High Priority</span><span class="sla-pill sla-urgent">⏱ 2h left</span></div>
+        </div>
+      </div>
+      <div class="triage-item urgent" onclick="navigate('monitoring')">
+        <div class="ti-ico">🧪</div>
+        <div style="flex:1">
+          <div class="ti-title">Mehta Cold Storage — 70 Days No Test Submission</div>
+          <div class="ti-sub">Routine monitoring overdue by 40 days. Formal notice must be issued.</div>
+          <div class="ti-meta"><span class="badge b-red">Missing Tests</span><span class="sla-pill sla-urgent">⏱ Escalate today</span></div>
+        </div>
+      </div>
+      <div class="triage-item urgent" onclick="navigate('inspections')">
+        <div class="ti-ico">🔍</div>
+        <div style="flex:1">
+          <div class="ti-title">7 Inspections Are Overdue</div>
+          <div class="ti-sub">Past scheduled date. Re-assign or escalate to district head immediately.</div>
+          <div class="ti-meta"><span class="badge b-red">Overdue</span><span class="sla-pill sla-urgent">⏱ Escalate today</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="triage-section">
+      <div class="triage-header">
+        <div class="triage-dot" style="background:var(--amber)"></div>
+        <div class="triage-title" style="color:var(--amberDk)">This Week</div>
+        <div class="triage-count" style="background:var(--amberLt);color:var(--amberDk)">4</div>
+      </div>
+      <div class="triage-item warn" onclick="navigate('applications')">
+        <div class="ti-ico">📋</div>
+        <div style="flex:1">
+          <div class="ti-title">43 License Renewals Due Within 30 Days</div>
+          <div class="ti-sub">Send proactive renewal reminders and review pending renewals in the queue.</div>
+          <div class="ti-meta"><span class="badge b-amber">Renewals</span><span class="sla-pill sla-warn">⏱ 30 days</span></div>
+        </div>
+      </div>
+      <div class="triage-item warn" onclick="navigate('grievances')">
+        <div class="ti-ico">💬</div>
+        <div style="flex:1">
+          <div class="ti-title">Agro Foods — Gastric Illness Complaint</div>
+          <div class="ti-sub">Multiple consumers reported illness after consuming batch AGR-B-0112. Testing needed.</div>
+          <div class="ti-meta"><span class="badge b-amber">Under Review</span><span class="sla-pill sla-warn">⏱ 48h SLA</span></div>
+        </div>
+      </div>
+      <div class="triage-item warn" onclick="navigate('monitoring')">
+        <div class="ti-ico">🏭</div>
+        <div style="flex:1">
+          <div class="ti-title">12 Businesses Haven't Filed Annual Returns</div>
+          <div class="ti-sub">Due date was 31 May. Send notices and escalate to compliance team.</div>
+          <div class="ti-meta"><span class="badge b-amber">Annual Returns</span><span class="sla-pill sla-warn">⏱ This week</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="triage-section" style="margin-bottom:0">
+      <div class="triage-header">
+        <div class="triage-dot" style="background:var(--sage)"></div>
+        <div class="triage-title" style="color:var(--sageDk)">For Your Attention</div>
+        <div class="triage-count" style="background:var(--sageLt);color:var(--sageDk)">2</div>
+      </div>
+      <div class="triage-item info" onclick="navigate('applications')">
+        <div class="ti-ico">📑</div>
+        <div style="flex:1">
+          <div class="ti-title">8 New Applications Awaiting Assignment</div>
+          <div class="ti-sub">Unassigned applications from this week. Review and assign to field officers.</div>
+          <div class="ti-meta"><span class="badge b-sage">New</span></div>
+        </div>
+      </div>
+      <div class="triage-item info" onclick="navigate('league')">
+        <div class="ti-ico">🏆</div>
+        <div style="flex:1">
+          <div class="ti-title">Monthly Rankings Updated — 3 Businesses Promoted</div>
+          <div class="ti-sub">Green Valley Organics, Krishna Sweets, and Sunshine Bakery moved to Gold tier.</div>
+          <div class="ti-meta"><span class="badge b-sage">League Update</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="g4 mb">
+    <div class="stat-card" onclick="navigate('applications')">
+      <div class="stat-ico s-navy">📋</div>
+      <div><div class="stat-val" id="dash-stat-pending">127</div><div class="stat-lbl">Pending Applications</div><span class="stat-chg chg-dn">↑ 8 this week</span></div>
+    </div>
+    <div class="stat-card" onclick="navigate('inspections')">
+      <div class="stat-ico s-red">⚠️</div>
+      <div><div class="stat-val" id="dash-stat-delayed">34</div><div class="stat-lbl">Delayed Cases</div><span class="stat-chg chg-dn">↑ 3 vs last week</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-ico s-sage">✅</div>
+      <div><div class="stat-val" id="dash-stat-approved">892</div><div class="stat-lbl">Approved Licenses</div><span class="stat-chg chg-up">↑ 22 this month</span></div>
+    </div>
+    <div class="stat-card" onclick="navigate('grievances')">
+      <div class="stat-ico s-amber">💬</div>
+      <div><div class="stat-val" id="dash-stat-grievances">5</div><div class="stat-lbl">Open Grievances</div><span class="stat-chg chg-neu">2 high priority</span></div>
+    </div>
+  </div>
+
+  <!-- Charts + Activity -->
+  <div class="gw">
+    <div class="card">
+      <div class="sh"><div class="sh-t">Recent Activity</div><div class="sh-a" onclick="showToast('Loading full log…')">View all</div></div>
+      <div class="act-list">
+        <div class="act-item"><div class="act-dot ad-navy"></div><div class="act-txt"><strong>Sunshine Bakery</strong> submitted renewal application</div><div class="act-time">2m ago</div></div>
+        <div class="act-item"><div class="act-dot ad-sage"></div><div class="act-txt">License approved for <strong>Ramesh Dairy Pvt. Ltd.</strong></div><div class="act-time">18m ago</div></div>
+        <div class="act-item"><div class="act-dot ad-red"></div><div class="act-txt">Complaint filed against <strong>Star Spice Mill</strong> — contamination</div><div class="act-time">1h ago</div></div>
+        <div class="act-item"><div class="act-dot ad-amber"></div><div class="act-txt">Routine test overdue for <strong>Mehta Cold Storage</strong> (70 days)</div><div class="act-time">3h ago</div></div>
+        <div class="act-item"><div class="act-dot ad-sage"></div><div class="act-txt">Inspection completed at <strong>Green Valley Organics</strong> — PASS</div><div class="act-time">5h ago</div></div>
+        <div class="act-item"><div class="act-dot ad-sage"></div><div class="act-txt"><strong>Krishna Sweets</strong> license renewed for 2 years</div><div class="act-time">Yesterday</div></div>
+      </div>
+    </div>
+    <div>
+      <div class="card mb">
+        <div class="sh"><div class="sh-t">Application Trend</div></div>
+        <div class="bar-chart" id="dash-chart"></div>
+      </div>
+      <div class="card">
+        <div class="sh"><div class="sh-t">Risk by Zone</div></div>
+        <div id="dash-risk"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ▌ MY QUEUE ▌ -->
+<div class="page" id="page-myqueue">
+  <div class="queue-meta-bar">
+    <div class="qm-item"><div class="qm-val">7</div><div class="qm-lbl">Total Assigned</div></div>
+    <div class="qm-item"><div class="qm-val" style="color:var(--red)">3</div><div class="qm-lbl">Urgent</div></div>
+    <div class="qm-item"><div class="qm-val" style="color:var(--amberDk)">4</div><div class="qm-lbl">This Week</div></div>
+    <div class="qm-item"><div class="qm-val" style="color:var(--sage)">0</div><div class="qm-lbl">Overdue</div></div>
+    <button class="btn btn-sage btn-sm" style="margin-left:auto;" onclick="showToast('Exporting your queue…')">⬇ Export</button>
+  </div>
+  <div class="tab-bar">
+    <div class="tab-btn active" onclick="switchTab('queue','apps',this)">📋 Applications (4)</div>
+    <div class="tab-btn" onclick="switchTab('queue','inspections',this)">🔍 Inspections (2)</div>
+    <div class="tab-btn" onclick="switchTab('queue','grievances',this)">💬 Grievances (1)</div>
+  </div>
+  <div class="tab-pane active" id="queue-tab-apps">
+    <div class="card card-flush">
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>App ID</th><th>Business</th><th>Step</th><th>Filed</th><th>Status</th><th>SLA</th><th></th></tr></thead>
+        <tbody>
+          <tr onclick="openAppDetail('app-001')"><td><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--g400)">FSSAI-2026-38642</span></td><td><strong>Annapurna Catering</strong></td><td><span class="badge b-amber">Step 3 — Docs Review</span></td><td style="color:var(--g500)">Mar 12</td><td><span class="badge b-amber">Pending</span></td><td><span class="sla-pill sla-warn">⏱ 3 days</span></td><td><button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();openAppDetail('app-001')">Review →</button></td></tr>
+          <tr onclick="openAppDetail('app-002')" class="row-flag"><td><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--g400)">FSSAI-2026-12891</span></td><td><strong>Raj Snacks Corner</strong> <span class="badge b-red">Flagged</span></td><td><span class="badge b-red">Step 2 — Docs Pending</span></td><td style="color:var(--g500)">Mar 18</td><td><span class="badge b-red">Delayed</span></td><td><span class="sla-pill sla-urgent">⏱ Overdue</span></td><td><button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();openAppDetail('app-002')">Review →</button></td></tr>
+          <tr onclick="openAppDetail('app-003')"><td><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--g400)">FSSAI-2026-55021</span></td><td><strong>Meera Tiffin Service</strong></td><td><span class="badge b-navy">Step 1 — Submitted</span></td><td style="color:var(--g500)">Mar 20</td><td><span class="badge b-navy">New</span></td><td><span class="sla-pill sla-ok">✓ 7 days</span></td><td><button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();openAppDetail('app-003')">Review →</button></td></tr>
+          <tr onclick="openAppDetail('app-004')"><td><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--g400)">FSSAI-2026-77103</span></td><td><strong>Fresh Juice Hub</strong></td><td><span class="badge b-green">Step 5 — Approved</span></td><td style="color:var(--g500)">Mar 22</td><td><span class="badge b-green">Approved</span></td><td><span class="sla-pill sla-ok">✓ Done</span></td><td><button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();openAppDetail('app-004')">View →</button></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+  <div class="tab-pane" id="queue-tab-inspections">
+    <div class="card" style="padding:24px;">
+      <div class="insp-card" onclick="showToast('Opening inspection details…')">
+        <div class="insp-date"><div class="insp-day">28</div><div class="insp-mon">Mar</div></div>
+        <div style="flex:1;">
+          <div class="insp-title">Annapurna Catering — Routine Inspection</div>
+          <div class="insp-meta">Laitumkhrah, Shillong · Assigned to Priya Verma</div>
+          <div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;">
+            <span class="badge b-amber">Pending</span>
+            <span class="badge b-navy">State License</span>
+          </div>
+        </div>
+      </div>
+      <div class="insp-card" onclick="showToast('Opening inspection details…')">
+        <div class="insp-date"><div class="insp-day">30</div><div class="insp-mon">Mar</div></div>
+        <div style="flex:1;">
+          <div class="insp-title">Raj Snacks Corner — Follow-up Inspection</div>
+          <div class="insp-meta">Police Bazar, Shillong · Assigned to Arun Mehta</div>
+          <div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;">
+            <span class="badge b-red">Urgent</span>
+            <span class="badge b-navy">Basic Registration</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="tab-pane" id="queue-tab-grievances">
+    <div class="card" style="padding:24px;">
+      <div class="griev-card" onclick="navigate('grievances')">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--navy);">Foreign object found in food</div>
+            <div class="gc-id">GRV-2026-00142 · Raj Snacks Corner</div>
+          </div>
+          <span class="badge b-red">Critical</span>
+        </div>
+        <div class="gc-body">Consumer reported finding a piece of plastic in their order. Batch number unknown. Immediate inspection required.</div>
+        <div style="margin-top:8px;font-size:11px;color:var(--g400);">Filed 20 Mar 2026 · SLA: 24 hours</div>
+      </div>
+    </div>
+  </div>
+</div>

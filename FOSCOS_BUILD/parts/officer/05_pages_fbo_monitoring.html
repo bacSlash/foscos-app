@@ -1,0 +1,214 @@
+<!-- ══════════════════════════════════════════════════════════════
+     PART 05 — FBO DIRECTORY + MONITORING + INSPECTIONS
+     ══════════════════════════════════════════════════════════════ -->
+
+<!-- ▌ FBO DIRECTORY ▌ -->
+<div class="page" id="page-fbo">
+  <div class="toolbar">
+    <div class="tb-inp"><span style="color:var(--g400)">🔍</span><input type="text" placeholder="Search FBOs, FSSAI no…" id="fbo-search" oninput="renderFBO()"/></div>
+    <select class="tb-sel" id="fbo-loc" onchange="renderFBO()">
+      <option value="">All Locations</option>
+      <option>Shillong</option><option>Tura</option><option>Nongpoh</option><option>Jowai</option>
+    </select>
+    <select class="tb-sel" id="fbo-type" onchange="renderFBO()">
+      <option value="">All Types</option>
+      <option>Restaurant / Café</option><option>Retail Shop</option><option>Manufacturer</option><option>Catering</option>
+    </select>
+    <div class="ftabs">
+      <div class="ft active" onclick="setFilt('fbo','All',this)">All</div>
+      <div class="ft" onclick="setFilt('fbo','Active',this)">Active</div>
+      <div class="ft" onclick="setFilt('fbo','Expiring',this)">Expiring</div>
+      <div class="ft" onclick="setFilt('fbo','Suspended',this)">Suspended</div>
+    </div>
+  </div>
+  <div class="card card-flush">
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>FSSAI No.</th><th>Business Name</th><th>Type</th><th>Location</th><th>Compliance</th><th>Risk</th><th>License Expiry</th><th></th></tr></thead>
+      <tbody id="fbo-tbody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ▌ MONITORING ▌ -->
+<div class="page" id="page-monitoring">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <!-- Overdue Tests -->
+    <div class="card">
+      <div class="sh"><div class="sh-t">🧪 Overdue Routine Tests</div><div class="sh-a" onclick="showToast('Sending bulk reminders…')">Send All Reminders</div></div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="triage-item urgent" onclick="showToast('Opening Mehta Cold Storage monitoring record…')">
+          <div class="ti-ico">🏭</div>
+          <div style="flex:1;">
+            <div class="ti-title">Mehta Cold Storage</div>
+            <div class="ti-sub">Last test: 70 days ago. Water & hygiene swab required.</div>
+            <div class="ti-meta"><span class="badge b-red">70 Days Overdue</span><span class="sla-pill sla-urgent">⏱ Escalate</span></div>
+          </div>
+        </div>
+        <div class="triage-item warn" onclick="showToast('Opening Spice Garden monitoring record…')">
+          <div class="ti-ico">🌶️</div>
+          <div style="flex:1;">
+            <div class="ti-title">Spice Garden Restaurant</div>
+            <div class="ti-sub">Last test: 42 days ago. Monthly test due.</div>
+            <div class="ti-meta"><span class="badge b-amber">42 Days</span><span class="sla-pill sla-warn">⏱ Due</span></div>
+          </div>
+        </div>
+        <div class="triage-item warn" onclick="showToast('Opening Mountain Bakery monitoring record…')">
+          <div class="ti-ico">🥐</div>
+          <div style="flex:1;">
+            <div class="ti-title">Mountain Bakery</div>
+            <div class="ti-sub">Last test: 35 days ago. Food safety swab overdue.</div>
+            <div class="ti-meta"><span class="badge b-amber">35 Days</span><span class="sla-pill sla-warn">⏱ Overdue</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Test Results -->
+    <div class="card">
+      <div class="sh"><div class="sh-t">✅ Recent Submissions</div></div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="padding:12px;border-radius:10px;background:var(--greenLt);display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--green);">Green Valley Organics</div>
+            <div style="font-size:11px;color:var(--g500);margin-top:2px;">Water test · Hygiene swab · All PASS</div>
+          </div>
+          <span class="badge b-green">PASS</span>
+        </div>
+        <div style="padding:12px;border-radius:10px;background:var(--greenLt);display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--green);">Annapurna Catering</div>
+            <div style="font-size:11px;color:var(--g500);margin-top:2px;">Surface swab test · Submitted 20 Mar</div>
+          </div>
+          <span class="badge b-green">PASS</span>
+        </div>
+        <div style="padding:12px;border-radius:10px;background:var(--redLt);display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--red);">Raj Snacks Corner</div>
+            <div style="font-size:11px;color:var(--g500);margin-top:2px;">Water test failed coliform threshold</div>
+          </div>
+          <span class="badge b-red">FAIL</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Compliance Overview -->
+  <div class="card mt">
+    <div class="sh"><div class="sh-t">Compliance Overview by Zone</div></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+      <div style="text-align:center;padding:16px;border-radius:10px;background:var(--greenLt);">
+        <div style="font-size:22px;font-weight:800;color:var(--green);">87%</div>
+        <div style="font-size:11px;color:var(--g500);margin-top:4px;">Laitumkhrah Zone</div>
+        <div class="risk-track" style="margin-top:8px;"><div class="risk-fill" style="width:87%;background:var(--green)"></div></div>
+      </div>
+      <div style="text-align:center;padding:16px;border-radius:10px;background:var(--amberLt);">
+        <div style="font-size:22px;font-weight:800;color:var(--amberDk);">72%</div>
+        <div style="font-size:11px;color:var(--g500);margin-top:4px;">Police Bazar Zone</div>
+        <div class="risk-track" style="margin-top:8px;"><div class="risk-fill" style="width:72%;background:var(--amber)"></div></div>
+      </div>
+      <div style="text-align:center;padding:16px;border-radius:10px;background:var(--greenLt);">
+        <div style="font-size:22px;font-weight:800;color:var(--green);">91%</div>
+        <div style="font-size:11px;color:var(--g500);margin-top:4px;">Mawlai Zone</div>
+        <div class="risk-track" style="margin-top:8px;"><div class="risk-fill" style="width:91%;background:var(--green)"></div></div>
+      </div>
+      <div style="text-align:center;padding:16px;border-radius:10px;background:var(--redLt);">
+        <div style="font-size:22px;font-weight:800;color:var(--red);">58%</div>
+        <div style="font-size:11px;color:var(--g500);margin-top:4px;">Nongthymmai Zone</div>
+        <div class="risk-track" style="margin-top:8px;"><div class="risk-fill" style="width:58%;background:var(--red)"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ▌ INSPECTIONS ▌ -->
+<div class="page" id="page-inspections">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+    <div style="font-size:15px;font-weight:700;color:var(--navy);">Inspection Schedule</div>
+    <button class="btn btn-primary btn-sm" onclick="openAssignModal()">+ Schedule Inspection</button>
+  </div>
+  <div class="tab-bar">
+    <div class="tab-btn active" onclick="switchTab('insp','upcoming',this)">📅 Upcoming (8)</div>
+    <div class="tab-btn" onclick="switchTab('insp','overdue',this)">⚠️ Overdue (7)</div>
+    <div class="tab-btn" onclick="switchTab('insp','completed',this)">✅ Completed (34)</div>
+  </div>
+  <div class="tab-pane active" id="insp-tab-upcoming">
+    <div style="display:flex;flex-direction:column;gap:0;">
+      <div class="insp-card" onclick="showToast('Opening inspection details…')">
+        <div class="insp-date"><div class="insp-day">28</div><div class="insp-mon">Mar</div></div>
+        <div style="flex:1;">
+          <div class="insp-title">Annapurna Catering — Routine Annual Inspection</div>
+          <div class="insp-meta">Laitumkhrah, Shillong · Assigned to Priya Verma · State License</div>
+          <div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;"><span class="badge b-sage">Scheduled</span><span class="badge b-navy">Annual</span></div>
+        </div>
+        <button class="btn btn-ghost btn-xs" style="flex-shrink:0;" onclick="event.stopPropagation();showToast('Opening details…')">View →</button>
+      </div>
+      <div class="insp-card" onclick="showToast('Opening inspection details…')">
+        <div class="insp-date"><div class="insp-day">30</div><div class="insp-mon">Mar</div></div>
+        <div style="flex:1;">
+          <div class="insp-title">Raj Snacks Corner — Follow-up Inspection</div>
+          <div class="insp-meta">Police Bazar, Shillong · Assigned to Arun Mehta · Basic Registration</div>
+          <div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;"><span class="badge b-amber">Follow-up</span><span class="badge b-red">High Risk</span></div>
+        </div>
+        <button class="btn btn-ghost btn-xs" style="flex-shrink:0;" onclick="event.stopPropagation();showToast('Opening details…')">View →</button>
+      </div>
+      <div class="insp-card" onclick="showToast('Opening inspection details…')">
+        <div class="insp-date"><div class="insp-day">02</div><div class="insp-mon">Apr</div></div>
+        <div style="flex:1;">
+          <div class="insp-title">Meera Tiffin Service — Pre-Approval Inspection</div>
+          <div class="insp-meta">Mawlai, Shillong · Assigned to Sunita Rao · State License</div>
+          <div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;"><span class="badge b-blue">Pre-Approval</span><span class="badge b-navy">State License</span></div>
+        </div>
+        <button class="btn btn-ghost btn-xs" style="flex-shrink:0;" onclick="event.stopPropagation();showToast('Opening details…')">View →</button>
+      </div>
+    </div>
+  </div>
+  <div class="tab-pane" id="insp-tab-overdue">
+    <div class="card" style="padding:24px;">
+      <div style="background:var(--redLt);border-radius:10px;padding:14px;display:flex;gap:12px;align-items:center;margin-bottom:12px;">
+        <span style="font-size:24px;">⚠️</span>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--red);">7 inspections are overdue</div>
+          <div style="font-size:12px;color:var(--g600);margin-top:2px;line-height:1.5;">These were due before today. Please re-assign or escalate to your district head immediately.</div>
+        </div>
+        <button class="btn btn-red btn-sm" style="flex-shrink:0;" onclick="showToast('Escalation report sent to district head.')">Escalate All</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;" id="overdue-list">
+        <div style="padding:12px;border-radius:10px;border:1px solid var(--redLt);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <div><div style="font-size:13px;font-weight:700;color:var(--navy);">Mountain Bakery</div><div style="font-size:11px;color:var(--g500);">Was due 15 Mar · Still unassigned</div></div>
+          <button class="btn btn-ghost btn-xs" onclick="openAssignModal()">Re-assign →</button>
+        </div>
+        <div style="padding:12px;border-radius:10px;border:1px solid var(--redLt);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <div><div style="font-size:13px;font-weight:700;color:var(--navy);">Fresh Juice Hub</div><div style="font-size:11px;color:var(--g500);">Was due 10 Mar · Officer unavailable</div></div>
+          <button class="btn btn-ghost btn-xs" onclick="openAssignModal()">Re-assign →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="tab-pane" id="insp-tab-completed">
+    <div class="card" style="padding:24px;">
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="padding:12px;border-radius:10px;background:var(--greenLt);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--green);">Green Valley Organics — PASS</div>
+            <div style="font-size:11px;color:var(--g500);">Completed 20 Mar 2026 · Inspector: Priya Verma</div>
+          </div>
+          <button class="btn btn-ghost btn-xs" onclick="showToast('Opening inspection report…')">Report →</button>
+        </div>
+        <div style="padding:12px;border-radius:10px;background:var(--greenLt);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--green);">Krishna Sweets — PASS</div>
+            <div style="font-size:11px;color:var(--g500);">Completed 18 Mar 2026 · Inspector: Arun Mehta</div>
+          </div>
+          <button class="btn btn-ghost btn-xs" onclick="showToast('Opening inspection report…')">Report →</button>
+        </div>
+        <div style="padding:12px;border-radius:10px;background:var(--redLt);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--red);">Raj Snacks Corner — FAIL</div>
+            <div style="font-size:11px;color:var(--g500);">Completed 12 Mar 2026 · Follow-up scheduled</div>
+          </div>
+          <button class="btn btn-ghost btn-xs" onclick="showToast('Opening inspection report…')">Report →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

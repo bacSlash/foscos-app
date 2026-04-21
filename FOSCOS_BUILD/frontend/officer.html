@@ -1,0 +1,1913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>FoSCoS — Officer Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#243856;--navyDk:#182840;--navyLt:#EDF2F7;
+  --sage:#AEB884;--sageLt:#F0F3E8;--sageDk:#6a8a4a;
+  --amber:#DFA36D;--amberLt:#FDF3E7;--amberDk:#b87d3e;
+  --cream:#FFFDE4;
+  --red:#DC2626;--redLt:#FEE2E2;
+  --green:#16A34A;--greenLt:#DCFCE7;
+  --blue:#2563EB;--blueLt:#EFF6FF;
+  --purple:#7C3AED;--purpleLt:#EDE9FE;
+  --g50:#F9FAFB;--g100:#F3F4F6;--g200:#E5E7EB;--g300:#D1D5DB;
+  --g400:#9CA3AF;--g500:#6B7280;--g600:#4B5563;--g700:#374151;--g900:#111827;
+  --border:#E2E8D0;
+  --sw:248px;--th:58px;--r:12px;
+  --s1:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --s2:0 4px 16px rgba(0,0,0,.08);
+  --s3:0 10px 40px rgba(0,0,0,.14);
+  --tr:.17s ease;
+}
+body{font-family:'DM Sans',sans-serif;background:#F4F6F0;color:var(--g900);display:flex;height:100vh;overflow:hidden;font-size:14px;line-height:1.5}
+button,input,select,textarea{font-family:'DM Sans',sans-serif;}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--g300);border-radius:99px}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ── LOGIN PAGE ── */
+#officer-login-page{position:fixed;inset:0;background:linear-gradient(135deg,var(--navyDk),var(--navy));display:flex;align-items:center;justify-content:center;z-index:500}
+#officer-login-page.hidden{display:none}
+.login-card{background:#fff;border-radius:20px;padding:40px;width:400px;max-width:95vw;box-shadow:var(--s3)}
+
+/* ── SIDEBAR ── */
+#sidebar{width:var(--sw);background:var(--navyDk);display:flex;flex-direction:column;height:100vh;position:fixed;left:0;top:0;z-index:100;flex-shrink:0}
+.sb-logo{height:var(--th);display:flex;align-items:center;gap:10px;padding:0 16px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
+.sb-mark{width:32px;height:32px;background:var(--sage);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px;flex-shrink:0}
+.sb-name{font-weight:700;font-size:13px;color:#fff;line-height:1.2}
+.sb-sub{font-size:9px;color:rgba(255,255,255,.35);letter-spacing:.3px}
+.sb-nav{flex:1;padding:8px;overflow-y:auto}
+.sb-sec{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.3);padding:14px 10px 5px}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;color:rgba(255,255,255,.55);font-weight:500;font-size:12.5px;transition:var(--tr);user-select:none;position:relative}
+.sb-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.85)}
+.sb-item.active{background:rgba(174,184,132,.18);color:var(--sage);border-left:2px solid var(--sage);padding-left:8px}
+.sb-ico{font-size:14px;width:18px;text-align:center;flex-shrink:0}
+.sb-badge{margin-left:auto;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:99px;min-width:18px;text-align:center}
+.sb-badge.am{background:var(--amber)}
+.sb-badge.gr{background:var(--sage)}
+.sb-foot{padding:10px;border-top:1px solid rgba(255,255,255,.08);flex-shrink:0}
+.sb-user{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:var(--tr)}
+.sb-user:hover{background:rgba(255,255,255,.06)}
+.sb-av{width:30px;height:30px;border-radius:50%;background:var(--sage);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:11px;flex-shrink:0}
+.sb-un{font-weight:600;font-size:12px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-ur{font-size:9px;color:rgba(255,255,255,.35)}
+
+/* ── TOPBAR ── */
+#topbar{position:fixed;top:0;left:var(--sw);right:0;height:var(--th);background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:10px;z-index:90}
+#pg-title{font-family:'DM Serif Display',serif;font-weight:400;font-size:18px;flex:1;color:var(--navy)}
+.tb-srch{display:flex;align-items:center;gap:7px;background:var(--g50);border:1px solid var(--g200);border-radius:8px;padding:6px 12px;width:200px}
+.tb-srch input{background:none;border:none;outline:none;font-size:12.5px;color:var(--g900);width:100%}
+.tb-srch input::placeholder{color:var(--g400)}
+.ic-btn{width:32px;height:32px;border-radius:8px;background:var(--g50);border:1px solid var(--g200);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:var(--tr);position:relative;flex-shrink:0}
+.ic-btn:hover{background:var(--g100)}
+.ndot{position:absolute;top:5px;right:5px;width:7px;height:7px;background:var(--red);border-radius:50%;border:2px solid #fff}
+.tb-date{font-size:11px;color:var(--g500);font-weight:500;white-space:nowrap}
+
+/* ── MAIN ── */
+#main{margin-left:var(--sw);margin-top:var(--th);flex:1;overflow-y:auto;height:calc(100vh - var(--th));padding:22px}
+#main-inner{display:none}
+#main-inner.visible{display:block}
+
+/* ── PAGES ── */
+.page{display:none}
+.page.active{display:block;animation:fadeUp .22s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── CARDS ── */
+.card{background:#fff;border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--s1);padding:20px}
+.card-flush{padding:0;overflow:hidden}
+.card:hover{box-shadow:var(--s2)}
+
+/* ── GRIDS ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.gw{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+.mt{margin-top:14px}
+.mb{margin-bottom:14px}
+
+/* ── STAT CARDS ── */
+.stat-card{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:16px;display:flex;align-items:flex-start;gap:12px;box-shadow:var(--s1);cursor:pointer;transition:var(--tr)}
+.stat-card:hover{box-shadow:var(--s2);transform:translateY(-1px)}
+.stat-ico{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.s-navy{background:var(--navyLt)} .s-sage{background:var(--sageLt)} .s-red{background:var(--redLt)} .s-amber{background:var(--amberLt)} .s-green{background:var(--greenLt)}
+.stat-val{font-size:24px;font-weight:700;line-height:1;letter-spacing:-.5px;color:var(--navy)}
+.stat-lbl{font-size:11px;color:var(--g500);margin-top:3px;font-weight:500}
+.stat-chg{font-size:10px;font-weight:600;margin-top:5px;display:inline-flex;align-items:center;gap:2px;padding:2px 6px;border-radius:99px}
+.chg-up{background:var(--greenLt);color:var(--green)} .chg-dn{background:var(--redLt);color:var(--red)} .chg-neu{background:var(--amberLt);color:var(--amberDk)}
+
+/* ── SECTION HEADER ── */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sh-t{font-size:13px;font-weight:700;color:var(--navy)}
+.sh-a{font-size:11px;color:var(--sage);font-weight:600;cursor:pointer}
+.sh-a:hover{text-decoration:underline}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600}
+.b-navy{background:var(--navyLt);color:var(--navy)}
+.b-sage{background:var(--sageLt);color:var(--sageDk)}
+.b-green{background:var(--greenLt);color:var(--green)}
+.b-red{background:var(--redLt);color:var(--red)}
+.b-amber{background:var(--amberLt);color:var(--amberDk)}
+.b-grey{background:var(--g100);color:var(--g600)}
+.b-blue{background:var(--blueLt);color:var(--blue)}
+.b-purple{background:var(--purpleLt);color:var(--purple)}
+
+/* ── STATUS PILLS ── */
+.spill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700}
+.spill::before{content:'';width:6px;height:6px;border-radius:50%}
+.sp-reg{background:var(--greenLt);color:var(--green)}.sp-reg::before{background:var(--green)}
+.sp-irr{background:var(--amberLt);color:var(--amberDk)}.sp-irr::before{background:var(--amber)}
+.sp-mis{background:var(--redLt);color:var(--red)}.sp-mis::before{background:var(--red)}
+
+/* ── PIPELINE ── */
+.pipeline{display:flex;align-items:center;gap:0;margin:18px 0;background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;overflow-x:auto}
+.pipe-step{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;position:relative;min-width:80px}
+.pipe-step:not(:last-child)::after{content:'';position:absolute;top:14px;left:calc(50% + 14px);right:calc(-50% + 14px);height:2px;background:var(--g200);z-index:0}
+.pipe-step.done::after,.pipe-step.active::after{background:var(--sage)}
+.pipe-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;border:2px solid var(--g200);background:#fff;z-index:1;transition:var(--tr)}
+.pipe-step.done .pipe-dot{background:var(--sage);border-color:var(--sage);color:#fff}
+.pipe-step.active .pipe-dot{background:var(--amber);border-color:var(--amber);color:#fff;box-shadow:0 0 0 4px rgba(223,163,109,.2)}
+.pipe-step.blocked .pipe-dot{background:var(--redLt);border-color:var(--red);color:var(--red)}
+.pipe-lbl{font-size:10px;font-weight:600;color:var(--g500);text-align:center;white-space:nowrap}
+.pipe-step.done .pipe-lbl{color:var(--sageDk)}
+.pipe-step.active .pipe-lbl{color:var(--amberDk);font-weight:700}
+.pipe-step.blocked .pipe-lbl{color:var(--red)}
+
+/* ── AUDIT TRAIL ── */
+.audit-item{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--g100);position:relative}
+.audit-item:last-child{border-bottom:none}
+.audit-item:not(:last-child)::before{content:'';position:absolute;left:14px;top:36px;bottom:-11px;width:1px;background:var(--g200)}
+.audit-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;z-index:1}
+.audit-body{flex:1}
+.audit-action{font-size:13px;font-weight:600;color:var(--navy)}
+.audit-meta{font-size:11px;color:var(--g500);margin-top:2px}
+.audit-note{font-size:12px;color:var(--g600);margin-top:5px;padding:8px 10px;background:var(--g50);border-radius:7px;border-left:2px solid var(--g300);line-height:1.5}
+
+/* ── TRIAGE ── */
+.triage-section{margin-bottom:18px}
+.triage-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.triage-dot{width:8px;height:8px;border-radius:50%}
+.triage-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px}
+.triage-count{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px}
+.triage-item{background:#fff;border:1px solid var(--border);border-radius:10px;padding:13px 15px;margin-bottom:8px;cursor:pointer;transition:var(--tr);display:flex;align-items:flex-start;gap:12px}
+.triage-item:hover{box-shadow:var(--s2);border-color:var(--g300)}
+.triage-item.urgent{border-left:3px solid var(--red)}
+.triage-item.warn{border-left:3px solid var(--amber)}
+.triage-item.info{border-left:3px solid var(--sage)}
+.ti-ico{font-size:20px;flex-shrink:0;margin-top:1px}
+.ti-title{font-size:13px;font-weight:700;color:var(--navy)}
+.ti-sub{font-size:12px;color:var(--g500);margin-top:2px;line-height:1.5}
+.ti-meta{display:flex;gap:7px;margin-top:7px;flex-wrap:wrap;align-items:center}
+
+/* ── SLA TIMER ── */
+.sla-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:99px;font-size:10px;font-weight:700}
+.sla-urgent{background:var(--redLt);color:var(--red)}
+.sla-warn{background:var(--amberLt);color:var(--amberDk)}
+.sla-ok{background:var(--greenLt);color:var(--green)}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead th{text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--g500);padding:9px 14px;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--g50)}
+tbody tr{cursor:pointer;transition:var(--tr);border-bottom:1px solid var(--g100)}
+tbody tr:hover{background:#F0F7EE}
+tbody td{padding:11px 14px;font-size:12.5px;vertical-align:middle}
+tbody tr:last-child{border-bottom:none}
+.row-flag{background:var(--redLt)!important}
+.row-flag:hover{background:#FEE2E2!important}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.tb-inp{display:flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:7px 12px;flex:1;min-width:160px;max-width:220px}
+.tb-inp input{background:none;border:none;outline:none;font-size:12.5px;width:100%}
+.tb-sel{background:#fff;border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:12px;color:var(--g700);cursor:pointer;outline:none;font-weight:500}
+.ftabs{display:flex;gap:3px;flex-wrap:wrap}
+.ft{padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:#fff;color:var(--g600);transition:var(--tr)}
+.ft.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.ft:hover:not(.active){background:var(--g100)}
+
+/* ── INNER TABS ── */
+.tab-bar{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:16px}
+.tab-btn{padding:8px 15px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--g500);border-bottom:2px solid transparent;margin-bottom:-2px;transition:var(--tr);white-space:nowrap}
+.tab-btn:hover:not(.active){color:var(--navy)}
+.tab-btn.active{color:var(--navy);border-bottom-color:var(--sage)}
+.tab-pane{display:none}
+.tab-pane.active{display:block;animation:fadeUp .18s ease}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;border:none;transition:var(--tr);white-space:nowrap;font-family:'DM Sans',sans-serif}
+.btn-primary{background:var(--navy);color:#fff}.btn-primary:hover{background:var(--navyDk)}
+.btn-sage{background:var(--sage);color:#fff}.btn-sage:hover{background:var(--sageDk)}
+.btn-amber{background:var(--amber);color:#fff}.btn-amber:hover{background:var(--amberDk)}
+.btn-ghost{background:transparent;color:var(--g600);border:1px solid var(--border)}.btn-ghost:hover{background:var(--g100)}
+.btn-red{background:var(--redLt);color:var(--red)}.btn-red:hover{background:#FCA5A5}
+.btn-green{background:var(--greenLt);color:var(--green)}.btn-green:hover{background:#86EFAC}
+.btn-sm{padding:5px 11px;font-size:11.5px}
+.btn-xs{padding:3px 9px;font-size:11px;border-radius:6px}
+
+/* ── MODAL ── */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:300;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .18s ease}
+.modal-ov.open{opacity:1;pointer-events:all}
+.modal{background:#fff;border-radius:16px;padding:26px;width:420px;max-width:95vw;box-shadow:var(--s3);transform:scale(.96);transition:transform .18s ease}
+.modal-ov.open .modal{transform:scale(1)}
+.modal-title{font-family:'DM Serif Display',serif;font-size:18px;margin-bottom:3px;color:var(--navy)}
+.modal-sub{font-size:12px;color:var(--g500);margin-bottom:16px}
+.fg{margin-bottom:12px}
+.fl{font-size:11px;font-weight:600;color:var(--g700);margin-bottom:4px;display:block}
+.fc{width:100%;padding:8px 11px;border:1.5px solid var(--border);border-radius:8px;font-size:12.5px;outline:none;transition:var(--tr);background:#fff;font-family:'DM Sans',sans-serif;color:var(--g900)}
+.fc:focus{border-color:var(--sage);box-shadow:0 0 0 3px rgba(174,184,132,.18)}
+select.fc{cursor:pointer}
+textarea.fc{resize:vertical;min-height:80px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+
+/* ── ACTIVITY LIST ── */
+.act-list{display:flex;flex-direction:column}
+.act-item{display:flex;align-items:flex-start;gap:9px;padding:9px 0;border-bottom:1px solid var(--g100)}
+.act-item:last-child{border-bottom:none}
+.act-dot{width:7px;height:7px;border-radius:50%;margin-top:6px;flex-shrink:0}
+.ad-sage{background:var(--sage)} .ad-red{background:var(--red)} .ad-amber{background:var(--amber)} .ad-navy{background:var(--navy)} .ad-green{background:var(--green)}
+.act-txt{font-size:12.5px;flex:1;line-height:1.5;color:var(--g700)}
+.act-txt strong{color:var(--g900);font-weight:600}
+.act-time{font-size:10px;color:var(--g400);white-space:nowrap;margin-top:3px}
+
+/* ── INSPECTIONS ── */
+.insp-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 15px;display:flex;align-items:flex-start;gap:12px;margin-bottom:9px;cursor:pointer;transition:var(--tr)}
+.insp-card:hover{box-shadow:var(--s2)}
+.insp-date{text-align:center;min-width:40px;background:var(--navyLt);border-radius:8px;padding:6px 5px;flex-shrink:0}
+.insp-day{font-size:18px;font-weight:700;color:var(--navy);line-height:1}
+.insp-mon{font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase}
+
+/* ── GRIEVANCE CARDS ── */
+.griev-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 15px;margin-bottom:9px;cursor:pointer;transition:var(--tr)}
+.griev-card:hover{box-shadow:var(--s2)}
+.gc-id{font-family:'DM Mono',monospace;font-size:10px;color:var(--g400);margin-top:2px}
+.gc-body{font-size:12px;color:var(--g600);margin-top:6px;line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+
+/* ── BAR CHART ── */
+.bar-chart{height:150px;display:flex;align-items:flex-end;gap:5px;padding-top:12px}
+.bc-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bc-bar{width:100%;border-radius:4px 4px 0 0;transition:height .9s cubic-bezier(.4,0,.2,1);min-height:3px}
+.bc-lbl{font-size:10px;color:var(--g400);white-space:nowrap}
+
+/* ── RISK BARS ── */
+.risk-item{margin-bottom:11px}
+.risk-hd{display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:4px}
+.risk-track{height:6px;background:var(--g100);border-radius:99px;overflow:hidden}
+.risk-fill{height:100%;border-radius:99px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+
+/* ── INFO FIELDS ── */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.if-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--g400);margin-bottom:3px}
+.if-val{font-size:13px;font-weight:500;color:var(--g900)}
+
+/* ── DOC ITEMS ── */
+.doc-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--g100)}
+.doc-item:last-child{border-bottom:none}
+.doc-ico{font-size:17px}
+.doc-name{font-size:13px;font-weight:500;flex:1}
+.doc-actions{display:flex;gap:5px}
+
+/* ── LEAGUE CARDS ── */
+.league-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.lcard{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:18px;transition:var(--tr);cursor:pointer;position:relative;overflow:hidden}
+.lcard:hover{box-shadow:var(--s2);transform:translateY(-2px)}
+.lcard.gold{border-color:#FCD34D;border-width:2px}
+.lcard.silver{border-color:#CBD5E1;border-width:2px}
+.lcard.bronze{border-color:#D97706;border-width:2px}
+.lcard-rank{position:absolute;top:12px;right:12px;font-size:20px}
+.lcard-score{font-size:26px;font-weight:800;color:var(--navy);letter-spacing:-.5px;margin:8px 0 2px}
+
+/* ── SIDE PANEL ── */
+#panel-ov{position:fixed;inset:0;background:rgba(0,0,0,.15);z-index:199;display:none}
+#side-panel{position:fixed;top:0;right:0;bottom:0;width:440px;background:#fff;border-left:1px solid var(--border);box-shadow:var(--s3);z-index:200;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden}
+#sp-hd{padding:16px 18px;border-bottom:1px solid var(--border);flex-shrink:0}
+#sp-body{flex:1;overflow-y:auto;padding:16px 18px}
+#sp-foot{padding:12px 18px;border-top:1px solid var(--border);display:flex;gap:7px;flex-shrink:0}
+.sp-close{background:var(--g100);border:none;cursor:pointer;width:27px;height:27px;border-radius:6px;font-size:13px;display:flex;align-items:center;justify-content:center;transition:var(--tr)}
+.sp-close:hover{background:var(--g200)}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:22px;right:22px;background:var(--navy);color:#fff;padding:10px 16px;border-radius:9px;font-size:12.5px;font-weight:500;box-shadow:var(--s3);transform:translateY(60px);opacity:0;transition:all .25s cubic-bezier(.4,0,.2,1);z-index:999;max-width:280px}
+#toast.show{transform:translateY(0);opacity:1}
+
+/* ── MY QUEUE ── */
+.queue-empty{text-align:center;padding:48px;color:var(--g400)}
+.queue-meta-bar{background:var(--sageLt);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;gap:18px;align-items:center;margin-bottom:14px}
+.qm-item{display:flex;flex-direction:column;align-items:center}
+.qm-val{font-size:18px;font-weight:700;color:var(--navy)}
+.qm-lbl{font-size:10px;color:var(--g500)}
+
+/* ── FBO PROFILE ── */
+#fbo-profile-page{display:none}
+#fbo-profile-page.active{display:block;animation:fadeUp .22s ease}
+.fbo-prof-hd{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:16px;display:flex;align-items:flex-start;gap:14px;box-shadow:var(--s1)}
+.fbo-logo-lg{width:50px;height:50px;border-radius:10px;background:var(--navyLt);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+
+/* ── APP DETAIL ── */
+#app-detail-page{display:none}
+#app-detail-page.active{display:block;animation:fadeUp .22s ease}
+.app-det-hd{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:16px;display:flex;align-items:flex-start;gap:14px;box-shadow:var(--s1)}
+
+/* ── MISC ── */
+.chip{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:var(--g100);border-radius:5px;font-size:11px;color:var(--g600);font-weight:500}
+.divider{height:1px;background:var(--border);margin:14px 0}
+.empty{text-align:center;padding:36px;color:var(--g400);font-size:13px}
+.empty-ico{font-size:30px;margin-bottom:8px}
+.flag-history-item{padding:10px 12px;background:var(--redLt);border-radius:8px;border-left:3px solid var(--red);margin-bottom:8px;font-size:12px;color:var(--g700)}
+.note-box{background:var(--amberLt);border:1px solid rgba(223,163,109,.3);border-radius:9px;padding:12px 14px;font-size:12px;color:var(--g700);line-height:1.6;margin-top:8px}
+
+/* ── OTP BOXES ── */
+.otp-box{width:44px;height:52px;border:1.5px solid var(--border);border-radius:10px;text-align:center;font-size:22px;font-weight:700;color:var(--navy);outline:none;transition:border-color .2s;background:#fff}
+.otp-box:focus{border-color:var(--navy)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  #sidebar{transform:translateX(-100%)}
+  #topbar,#main{left:0;margin-left:0}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PART 02 — OFFICER LOGIN + SIDEBAR + TOPBAR + PANELS
+     ══════════════════════════════════════════════════════════════ -->
+
+<!-- ── Officer Login Page ─────────────────────────────────────── -->
+<div id="officer-login-page">
+  <div class="login-card">
+    <div style="text-align:center;margin-bottom:28px;">
+      <div style="width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,var(--sage),var(--sageDk));display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 14px;">🏛️</div>
+      <div style="font-size:11px;font-weight:700;color:var(--sage);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">FSSAI — OFFICER PORTAL</div>
+      <h2 style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--navy);margin-bottom:6px;">Officer Login</h2>
+      <p style="font-size:13px;color:var(--g500);">Enter your registered mobile number to continue</p>
+    </div>
+
+    <div id="officer-login-p1">
+      <div class="fg">
+        <label class="fl">Mobile Number</label>
+        <div style="position:relative;">
+          <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13px;font-weight:600;color:var(--navy);">+91</span>
+          <input type="tel" id="officer-mobile" class="fc" placeholder="10-digit number" maxlength="10" style="padding-left:48px;" oninput="this.value=this.value.replace(/\D/g,'')"/>
+        </div>
+      </div>
+      <div id="officer-recaptcha"></div>
+      <button class="btn btn-primary" style="width:100%;" onclick="officerSendOTP()">Send OTP →</button>
+    </div>
+
+    <div id="officer-login-p2" style="display:none;">
+      <div style="text-align:center;margin-bottom:20px;">
+        <div style="font-size:32px;margin-bottom:8px;">📲</div>
+        <div style="font-size:14px;font-weight:700;color:var(--navy);">OTP Sent!</div>
+        <div style="font-size:12px;color:var(--g500);margin-top:4px;">Enter the 6-digit code sent to +91 <span id="officer-mobile-disp" style="font-weight:700;"></span></div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:20px;">
+        <input class="otp-box" maxlength="1" id="oo1" oninput="officerOtpAdv(1)"/>
+        <input class="otp-box" maxlength="1" id="oo2" oninput="officerOtpAdv(2)"/>
+        <input class="otp-box" maxlength="1" id="oo3" oninput="officerOtpAdv(3)"/>
+        <input class="otp-box" maxlength="1" id="oo4" oninput="officerOtpAdv(4)"/>
+        <input class="otp-box" maxlength="1" id="oo5" oninput="officerOtpAdv(5)"/>
+        <input class="otp-box" maxlength="1" id="oo6" oninput="officerOtpAdv(6)"/>
+      </div>
+      <div id="officer-otp-err" style="display:none;color:var(--red);font-size:12px;text-align:center;margin-bottom:10px;">❌ Invalid OTP. Please try again.</div>
+      <button class="btn btn-primary" style="width:100%;" onclick="officerVerifyOTP()">Verify & Enter Portal →</button>
+      <div style="text-align:center;margin-top:12px;">
+        <span style="font-size:12px;color:var(--g500);">Didn't receive it? </span>
+        <span style="font-size:12px;color:var(--sage);cursor:pointer;font-weight:600;" onclick="officerSendOTP()">Resend</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Sidebar ────────────────────────────────────────────────── -->
+<nav id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-mark">FS</div>
+    <div>
+      <div class="sb-name">FSSAI Portal</div>
+      <div class="sb-sub">Officer Management System</div>
+    </div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-sec">My Workspace</div>
+    <div class="sb-item active" data-page="dashboard" onclick="navigate('dashboard')"><span class="sb-ico">⊞</span>Dashboard</div>
+    <div class="sb-item" data-page="myqueue" onclick="navigate('myqueue')"><span class="sb-ico">📌</span>My Queue<span class="sb-badge" id="badge-queue">7</span></div>
+
+    <div class="sb-sec">FBO Management</div>
+    <div class="sb-item" data-page="applications" onclick="navigate('applications')"><span class="sb-ico">📋</span>Applications<span class="sb-badge" id="badge-apps">12</span></div>
+    <div class="sb-item" data-page="fbo" onclick="navigate('fbo')"><span class="sb-ico">🏢</span>FBO Directory</div>
+
+    <div class="sb-sec">Compliance</div>
+    <div class="sb-item" data-page="monitoring" onclick="navigate('monitoring')"><span class="sb-ico">🧪</span>Routine Monitoring<span class="sb-badge am">3</span></div>
+    <div class="sb-item" data-page="inspections" onclick="navigate('inspections')"><span class="sb-ico">🔍</span>Inspections</div>
+
+    <div class="sb-sec">Escalations</div>
+    <div class="sb-item" data-page="grievances" onclick="navigate('grievances')"><span class="sb-ico">💬</span>Grievances<span class="sb-badge" id="badge-griev">5</span></div>
+
+    <div class="sb-sec">Insights</div>
+    <div class="sb-item" data-page="league" onclick="navigate('league')"><span class="sb-ico">🏆</span>Clean Kitchen League</div>
+    <div class="sb-item" data-page="reports" onclick="navigate('reports')"><span class="sb-ico">📊</span>Reports</div>
+
+    <div class="sb-sec">Account</div>
+    <div class="sb-item" data-page="settings" onclick="navigate('settings')"><span class="sb-ico">⚙️</span>Settings &amp; Profile</div>
+  </div>
+  <div class="sb-foot">
+    <div class="sb-user" onclick="navigate('settings')">
+      <div class="sb-av" id="officer-avatar">RK</div>
+      <div>
+        <div class="sb-un" id="officer-name-sb">Officer</div>
+        <div class="sb-ur" id="officer-role-sb">FSSAI Officer</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Topbar ─────────────────────────────────────────────────── -->
+<header id="topbar">
+  <div id="pg-title">Dashboard</div>
+  <div class="tb-srch"><span style="color:var(--g400);font-size:13px">🔍</span><input type="text" placeholder="Search FBOs, cases, licenses…" oninput="handleTopbarSearch(this.value)"/></div>
+  <div class="tb-date" id="tb-date"></div>
+  <button class="ic-btn" onclick="openNotifPanel()">🔔<span class="ndot"></span></button>
+  <button class="ic-btn" onclick="navigate('settings')">⚙️</button>
+</header>
+
+<!-- ── Main content wrapper ───────────────────────────────────── -->
+<main id="main">
+<div id="main-inner" class="visible">
+
+<!-- ── Notifications side panel ──────────────────────────────── -->
+<div id="panel-ov" onclick="closePanel()"></div>
+<div id="side-panel">
+  <div id="sp-hd" style="display:flex;align-items:center;justify-content:space-between;">
+    <div>
+      <div style="font-size:14px;font-weight:700;color:var(--navy);">Notifications</div>
+      <div style="font-size:11px;color:var(--g500);margin-top:2px;">3 unread</div>
+    </div>
+    <button class="sp-close" onclick="closePanel()">✕</button>
+  </div>
+  <div id="sp-body">
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="padding:12px;border-radius:10px;background:var(--redLt);border-left:3px solid var(--red);">
+        <div style="font-size:12px;font-weight:700;color:var(--red);">🚨 High-Priority Grievance</div>
+        <div style="font-size:12px;color:var(--g700);margin-top:3px;line-height:1.5;">Foreign material reported in Star Spice Mill batch SS-2024-021. Action required within 2 hours.</div>
+        <div style="font-size:10px;color:var(--g400);margin-top:5px;">2 hours ago</div>
+      </div>
+      <div style="padding:12px;border-radius:10px;background:var(--amberLt);border-left:3px solid var(--amber);">
+        <div style="font-size:12px;font-weight:700;color:var(--amberDk);">⏱ SLA Warning</div>
+        <div style="font-size:12px;color:var(--g700);margin-top:3px;line-height:1.5;">APP-2024-0890 (Ramesh Dairy) is overdue. SLA breach imminent.</div>
+        <div style="font-size:10px;color:var(--g400);margin-top:5px;">4 hours ago</div>
+      </div>
+      <div style="padding:12px;border-radius:10px;background:var(--navyLt);border-left:3px solid var(--navy);">
+        <div style="font-size:12px;font-weight:700;color:var(--navy);">📋 New Applications</div>
+        <div style="font-size:12px;color:var(--g700);margin-top:3px;line-height:1.5;">8 new applications submitted today are awaiting assignment.</div>
+        <div style="font-size:10px;color:var(--g400);margin-top:5px;">6 hours ago</div>
+      </div>
+    </div>
+  </div>
+  <div id="sp-foot">
+    <button class="btn btn-ghost btn-sm" style="flex:1;" onclick="closePanel()">Close</button>
+    <button class="btn btn-primary btn-sm" onclick="showToast('Marked all as read');closePanel()">Mark all read</button>
+  </div>
+</div>
+
+<!-- ── Flag Modal ─────────────────────────────────────────────── -->
+<div class="modal-ov" id="flag-modal">
+  <div class="modal">
+    <div class="modal-title">🚩 Flag Application</div>
+    <div class="modal-sub">Add a reason for flagging this application for review.</div>
+    <div class="fg">
+      <label class="fl">Flag Reason</label>
+      <select class="fc" id="flag-reason-select">
+        <option value="">Select reason…</option>
+        <option>Document unclear or incomplete</option>
+        <option>Suspected fraudulent information</option>
+        <option>Address verification required</option>
+        <option>Lab report invalid or expired</option>
+        <option>Photo quality insufficient</option>
+        <option>Other (specify below)</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label class="fl">Additional Notes</label>
+      <textarea class="fc" id="flag-note" placeholder="Add notes for the applicant and your team…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" onclick="closeFlagModal()">Cancel</button>
+      <button class="btn btn-red btn-sm" onclick="submitFlag()">🚩 Flag Application</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Assign Inspection Modal ────────────────────────────────── -->
+<div class="modal-ov" id="assign-modal">
+  <div class="modal">
+    <div class="modal-title">🔍 Assign Inspection</div>
+    <div class="modal-sub">Schedule a field inspection for this application.</div>
+    <div class="fg">
+      <label class="fl">Assign To</label>
+      <select class="fc">
+        <option>Priya Verma — Field Officer</option>
+        <option>Arun Mehta — Senior Inspector</option>
+        <option>Sunita Rao — District Officer</option>
+        <option>Myself</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label class="fl">Inspection Date</label>
+      <input type="date" class="fc" id="insp-date"/>
+    </div>
+    <div class="fg" style="margin-bottom:0;">
+      <label class="fl">Notes</label>
+      <textarea class="fc" placeholder="Any special instructions for the inspection…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" onclick="closeAssignModal()">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="confirmAssign()">Assign Inspection</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Toast ──────────────────────────────────────────────────── -->
+<div id="toast"></div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PART 03 — DASHBOARD + MY QUEUE
+     ══════════════════════════════════════════════════════════════ -->
+
+<!-- ▌ DASHBOARD ▌ -->
+<div class="page active" id="page-dashboard">
+  <!-- Today's Action Items -->
+  <div style="background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;margin-bottom:16px;box-shadow:var(--s1);">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <div style="font-family:'DM Serif Display',serif;font-size:17px;color:var(--navy);">Today's Action Items</div>
+      <span style="font-size:11px;color:var(--g500);" id="dash-date-label"></span>
+      <button class="btn btn-ghost btn-sm" style="margin-left:auto;" onclick="navigate('myqueue')">View My Queue →</button>
+    </div>
+
+    <div class="triage-section">
+      <div class="triage-header">
+        <div class="triage-dot" style="background:var(--red)"></div>
+        <div class="triage-title" style="color:var(--red)">Urgent — Act Now</div>
+        <div class="triage-count" style="background:var(--redLt);color:var(--red)">3</div>
+      </div>
+      <div class="triage-item urgent" onclick="navigate('grievances')">
+        <div class="ti-ico">🚨</div>
+        <div style="flex:1">
+          <div class="ti-title">High-Priority Grievance — Star Spice Mill</div>
+          <div class="ti-sub">Consumer reported foreign material (plastic) in packaged spice. Batch SS-2024-021.</div>
+          <div class="ti-meta"><span class="badge b-red">High Priority</span><span class="sla-pill sla-urgent">⏱ 2h left</span></div>
+        </div>
+      </div>
+      <div class="triage-item urgent" onclick="navigate('monitoring')">
+        <div class="ti-ico">🧪</div>
+        <div style="flex:1">
+          <div class="ti-title">Mehta Cold Storage — 70 Days No Test Submission</div>
+          <div class="ti-sub">Routine monitoring overdue by 40 days. Formal notice must be issued.</div>
+          <div class="ti-meta"><span class="badge b-red">Missing Tests</span><span class="sla-pill sla-urgent">⏱ Escalate today</span></div>
+        </div>
+      </div>
+      <div class="triage-item urgent" onclick="navigate('inspections')">
+        <div class="ti-ico">🔍</div>
+        <div style="flex:1">
+          <div class="ti-title">7 Inspections Are Overdue</div>
+          <div class="ti-sub">Past scheduled date. Re-assign or escalate to district head immediately.</div>
+          <div class="ti-meta"><span class="badge b-red">Overdue</span><span class="sla-pill sla-urgent">⏱ Escalate today</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="triage-section">
+      <div class="triage-header">
+        <div class="triage-dot" style="background:var(--amber)"></div>
+        <div class="triage-title" style="color:var(--amberDk)">This Week</div>
+        <div class="triage-count" style="background:var(--amberLt);color:var(--amberDk)">4</div>
+      </div>
+      <div class="triage-item warn" onclick="navigate('applications')">
+        <div class="ti-ico">📋</div>
+        <div style="flex:1">
+          <div class="ti-title">43 License Renewals Due Within 30 Days</div>
+          <div class="ti-sub">Send proactive renewal reminders and review pending renewals in the queue.</div>
+          <div class="ti-meta"><span class="badge b-amber">Renewals</span><span class="sla-pill sla-warn">⏱ 30 days</span></div>
+        </div>
+      </div>
+      <div class="triage-item warn" onclick="navigate('grievances')">
+        <div class="ti-ico">💬</div>
+        <div style="flex:1">
+          <div class="ti-title">Agro Foods — Gastric Illness Complaint</div>
+          <div class="ti-sub">Multiple consumers reported illness after consuming batch AGR-B-0112. Testing needed.</div>
+          <div class="ti-meta"><span class="badge b-amber">Under Review</span><span class="sla-pill sla-warn">⏱ 48h SLA</span></div>
+        </div>
+      </div>
+      <div class="triage-item warn" onclick="navigate('monitoring')">
+        <div class="ti-ico">🏭</div>
+        <div style="flex:1">
+          <div class="ti-title">12 Businesses Haven't Filed Annual Returns</div>
+          <div class="ti-sub">Due date was 31 May. Send notices and escalate to compliance team.</div>
+          <div class="ti-meta"><span class="badge b-amber">Annual Returns</span><span class="sla-pill sla-warn">⏱ This week</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="triage-section" style="margin-bottom:0">
+      <div class="triage-header">
+        <div class="triage-dot" style="background:var(--sage)"></div>
+        <div class="triage-title" style="color:var(--sageDk)">For Your Attention</div>
+        <div class="triage-count" style="background:var(--sageLt);color:var(--sageDk)">2</div>
+      </div>
+      <div class="triage-item info" onclick="navigate('applications')">
+        <div class="ti-ico">📑</div>
+        <div style="flex:1">
+          <div class="ti-title">8 New Applications Awaiting Assignment</div>
+          <div class="ti-sub">Unassigned applications from this week. Review and assign to field officers.</div>
+          <div class="ti-meta"><span class="badge b-sage">New</span></div>
+        </div>
+      </div>
+      <div class="triage-item info" onclick="navigate('league')">
+        <div class="ti-ico">🏆</div>
+        <div style="flex:1">
+          <div class="ti-title">Monthly Rankings Updated — 3 Businesses Promoted</div>
+          <div class="ti-sub">Green Valley Organics, Krishna Sweets, and Sunshine Bakery moved to Gold tier.</div>
+          <div class="ti-meta"><span class="badge b-sage">League Update</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="g4 mb">
+    <div class="stat-card" onclick="navigate('applications')">
+      <div class="stat-ico s-navy">📋</div>
+      <div><div class="stat-val" id="dash-stat-pending">127</div><div class="stat-lbl">Pending Applications</div><span class="stat-chg chg-dn">↑ 8 this week</span></div>
+    </div>
+    <div class="stat-card" onclick="navigate('inspections')">
+      <div class="stat-ico s-red">⚠️</div>
+      <div><div class="stat-val" id="dash-stat-delayed">34</div><div class="stat-lbl">Delayed Cases</div><span class="stat-chg chg-dn">↑ 3 vs last week</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-ico s-sage">✅</div>
+      <div><div class="stat-val" id="dash-stat-approved">892</div><div class="stat-lbl">Approved Licenses</div><span class="stat-chg chg-up">↑ 22 this month</span></div>
+    </div>
+    <div class="stat-card" onclick="navigate('grievances')">
+      <div class="stat-ico s-amber">💬</div>
+      <div><div class="stat-val" id="dash-stat-grievances">5</div><div class="stat-lbl">Open Grievances</div><span class="stat-chg chg-neu">2 high priority</span></div>
+    </div>
+  </div>
+
+  <!-- Charts + Activity -->
+  <div class="gw">
+    <div class="card">
+      <div class="sh"><div class="sh-t">Recent Activity</div><div class="sh-a" onclick="showToast('Loading full log…')">View all</div></div>
+      <div class="act-list">
+        <div class="act-item"><div class="act-dot ad-navy"></div><div class="act-txt"><strong>Sunshine Bakery</strong> submitted renewal application</div><div class="act-time">2m ago</div></div>
+        <div class="act-item"><div class="act-dot ad-sage"></div><div class="act-txt">License approved for <strong>Ramesh Dairy Pvt. Ltd.</strong></div><div class="act-time">18m ago</div></div>
+        <div class="act-item"><div class="act-dot ad-red"></div><div class="act-txt">Complaint filed against <strong>Star Spice Mill</strong> — contamination</div><div class="act-time">1h ago</div></div>
+        <div class="act-item"><div class="act-dot ad-amber"></div><div class="act-txt">Routine test overdue for <strong>Mehta Cold Storage</strong> (70 days)</div><div class="act-time">3h ago</div></div>
+        <div class="act-item"><div class="act-dot ad-sage"></div><div class="act-txt">Inspection completed at <strong>Green Valley Organics</strong> — PASS</div><div class="act-time">5h ago</div></div>
+        <div class="act-item"><div class="act-dot ad-sage"></div><div class="act-txt"><strong>Krishna Sweets</strong> license renewed for 2 years</div><div class="act-time">Yesterday</div></div>
+      </div>
+    </div>
+    <div>
+      <div class="card mb">
+        <div class="sh"><div class="sh-t">Application Trend</div></div>
+        <div class="bar-chart" id="dash-chart"></div>
+      </div>
+      <div class="card">
+        <div class="sh"><div class="sh-t">Risk by Zone</div></div>
+        <div id="dash-risk"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ▌ MY QUEUE ▌ -->
+<div class="page" id="page-myqueue">
+  <div class="queue-meta-bar">
+    <div class="qm-item"><div class="qm-val">7</div><div class="qm-lbl">Total Assigned</div></div>
+    <div class="qm-item"><div class="qm-val" style="color:var(--red)">3</div><div class="qm-lbl">Urgent</div></div>
+    <div class="qm-item"><div class="qm-val" style="color:var(--amberDk)">4</div><div class="qm-lbl">This Week</div></div>
+    <div class="qm-item"><div class="qm-val" style="color:var(--sage)">0</div><div class="qm-lbl">Overdue</div></div>
+    <button class="btn btn-sage btn-sm" style="margin-left:auto;" onclick="showToast('Exporting your queue…')">⬇ Export</button>
+  </div>
+  <div class="tab-bar">
+    <div class="tab-btn active" onclick="switchTab('queue','apps',this)">📋 Applications (4)</div>
+    <div class="tab-btn" onclick="switchTab('queue','inspections',this)">🔍 Inspections (2)</div>
+    <div class="tab-btn" onclick="switchTab('queue','grievances',this)">💬 Grievances (1)</div>
+  </div>
+  <div class="tab-pane active" id="queue-tab-apps">
+    <div class="card card-flush">
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>App ID</th><th>Business</th><th>Step</th><th>Filed</th><th>Status</th><th>SLA</th><th></th></tr></thead>
+        <tbody>
+          <tr onclick="openAppDetail('app-001')"><td><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--g400)">FSSAI-2026-38642</span></td><td><strong>Annapurna Catering</strong></td><td><span class="badge b-amber">Step 3 — Docs Review</span></td><td style="color:var(--g500)">Mar 12</td><td><span class="badge b-amber">Pending</span></td><td><span class="sla-pill sla-warn">⏱ 3 days</span></td><td><button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();openAppDetail('app-001')">Review →</button></td></tr>
+          <tr onclick="openAppDetail('app-002')" class="row-flag"><td><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--g400)">FSSAI-2026-12891</span></td><td><strong>Raj Snacks Corner</strong> <span class="badge b-red">Flagged</span></td><td><span class="badge b-red">Step 2 — Docs Pending</span></td><td style="color:var(--g500)">Mar 18</td><td><span class="badge b-red">Delayed</span></td><td><span class="sla-pill sla-urgent">⏱ Overdue</span></td><td><button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();openAppDetail('app-002')">Review →</button></td></tr>
+          <tr onclick="openAppDetail('app-003')"><td><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--g400)">FSSAI-2026-55021</span></td><td><strong>Meera Tiffin Service</strong></td><td><span class="badge b-navy">Step 1 — Submitted</span></td><td style="color:var(--g500)">Mar 20</td><td><span class="badge b-navy">New</span></td><td><span class="sla-pill sla-ok">✓ 7 days</span></td><td><button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();openAppDetail('app-003')">Review →</button></td></tr>
+          <tr onclick="openAppDetail('app-004')"><td><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--g400)">FSSAI-2026-77103</span></td><td><strong>Fresh Juice Hub</strong></td><td><span class="badge b-green">Step 5 — Approved</span></td><td style="color:var(--g500)">Mar 22</td><td><span class="badge b-green">Approved</span></td><td><span class="sla-pill sla-ok">✓ Done</span></td><td><button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();openAppDetail('app-004')">View →</button></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+  <div class="tab-pane" id="queue-tab-inspections">
+    <div class="card" style="padding:24px;">
+      <div class="insp-card" onclick="showToast('Opening inspection details…')">
+        <div class="insp-date"><div class="insp-day">28</div><div class="insp-mon">Mar</div></div>
+        <div style="flex:1;">
+          <div class="insp-title">Annapurna Catering — Routine Inspection</div>
+          <div class="insp-meta">Laitumkhrah, Shillong · Assigned to Priya Verma</div>
+          <div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;">
+            <span class="badge b-amber">Pending</span>
+            <span class="badge b-navy">State License</span>
+          </div>
+        </div>
+      </div>
+      <div class="insp-card" onclick="showToast('Opening inspection details…')">
+        <div class="insp-date"><div class="insp-day">30</div><div class="insp-mon">Mar</div></div>
+        <div style="flex:1;">
+          <div class="insp-title">Raj Snacks Corner — Follow-up Inspection</div>
+          <div class="insp-meta">Police Bazar, Shillong · Assigned to Arun Mehta</div>
+          <div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;">
+            <span class="badge b-red">Urgent</span>
+            <span class="badge b-navy">Basic Registration</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="tab-pane" id="queue-tab-grievances">
+    <div class="card" style="padding:24px;">
+      <div class="griev-card" onclick="navigate('grievances')">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--navy);">Foreign object found in food</div>
+            <div class="gc-id">GRV-2026-00142 · Raj Snacks Corner</div>
+          </div>
+          <span class="badge b-red">Critical</span>
+        </div>
+        <div class="gc-body">Consumer reported finding a piece of plastic in their order. Batch number unknown. Immediate inspection required.</div>
+        <div style="margin-top:8px;font-size:11px;color:var(--g400);">Filed 20 Mar 2026 · SLA: 24 hours</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PART 04 — APPLICATIONS + APP DETAIL + FBO PROFILE
+     ══════════════════════════════════════════════════════════════ -->
+
+<!-- ▌ APPLICATIONS ▌ -->
+<div class="page" id="page-applications">
+  <div class="toolbar">
+    <div class="tb-inp"><span style="color:var(--g400)">🔍</span><input type="text" placeholder="Search applications…" id="app-search" oninput="renderApps()"/></div>
+    <div class="ftabs" id="app-ftabs">
+      <div class="ft active" onclick="setFilt('app','All',this)">All</div>
+      <div class="ft" onclick="setFilt('app','New',this)">New</div>
+      <div class="ft" onclick="setFilt('app','Pending',this)">Pending</div>
+      <div class="ft" onclick="setFilt('app','Approved',this)">Approved</div>
+      <div class="ft" onclick="setFilt('app','Delayed',this)">Delayed</div>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="showToast('Exporting CSV…')">⬇ Export</button>
+  </div>
+  <div class="card card-flush">
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>App ID</th><th>Business Name</th><th>Category</th><th>Date Filed</th><th>Pipeline Step</th><th>Status</th><th>Officer</th><th></th></tr></thead>
+      <tbody id="app-tbody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ▌ APPLICATION DETAIL PAGE ▌ -->
+<div id="app-detail-page">
+  <div style="margin-bottom:14px">
+    <button class="btn btn-ghost btn-sm" onclick="closeAppDetail()">← Back to Applications</button>
+  </div>
+  <div class="app-det-hd" id="app-det-hd"></div>
+
+  <div class="pipeline" id="app-pipeline"></div>
+
+  <div class="tab-bar">
+    <div class="tab-btn active" onclick="switchTab('appdet','info',this)">Business Info</div>
+    <div class="tab-btn" onclick="switchTab('appdet','docs',this)">Documents</div>
+    <div class="tab-btn" onclick="switchTab('appdet','trail',this)">Audit Trail</div>
+    <div class="tab-btn" onclick="switchTab('appdet','flags',this)">Flag History</div>
+  </div>
+  <div class="tab-pane active" id="appdet-tab-info"><div id="appdet-info-content"></div></div>
+  <div class="tab-pane" id="appdet-tab-docs"><div id="appdet-docs-content"></div></div>
+  <div class="tab-pane" id="appdet-tab-trail"><div id="appdet-trail-content"></div></div>
+  <div class="tab-pane" id="appdet-tab-flags"><div id="appdet-flags-content"></div></div>
+</div>
+
+<!-- ▌ FBO PROFILE PAGE ▌ -->
+<div id="fbo-profile-page">
+  <div style="margin-bottom:14px">
+    <button class="btn btn-ghost btn-sm" onclick="closeFBOProfile()">← Back</button>
+  </div>
+  <div id="fbo-profile-content"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PART 05 — FBO DIRECTORY + MONITORING + INSPECTIONS
+     ══════════════════════════════════════════════════════════════ -->
+
+<!-- ▌ FBO DIRECTORY ▌ -->
+<div class="page" id="page-fbo">
+  <div class="toolbar">
+    <div class="tb-inp"><span style="color:var(--g400)">🔍</span><input type="text" placeholder="Search FBOs, FSSAI no…" id="fbo-search" oninput="renderFBO()"/></div>
+    <select class="tb-sel" id="fbo-loc" onchange="renderFBO()">
+      <option value="">All Locations</option>
+      <option>Shillong</option><option>Tura</option><option>Nongpoh</option><option>Jowai</option>
+    </select>
+    <select class="tb-sel" id="fbo-type" onchange="renderFBO()">
+      <option value="">All Types</option>
+      <option>Restaurant / Café</option><option>Retail Shop</option><option>Manufacturer</option><option>Catering</option>
+    </select>
+    <div class="ftabs">
+      <div class="ft active" onclick="setFilt('fbo','All',this)">All</div>
+      <div class="ft" onclick="setFilt('fbo','Active',this)">Active</div>
+      <div class="ft" onclick="setFilt('fbo','Expiring',this)">Expiring</div>
+      <div class="ft" onclick="setFilt('fbo','Suspended',this)">Suspended</div>
+    </div>
+  </div>
+  <div class="card card-flush">
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>FSSAI No.</th><th>Business Name</th><th>Type</th><th>Location</th><th>Compliance</th><th>Risk</th><th>License Expiry</th><th></th></tr></thead>
+      <tbody id="fbo-tbody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ▌ MONITORING ▌ -->
+<div class="page" id="page-monitoring">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <!-- Overdue Tests -->
+    <div class="card">
+      <div class="sh"><div class="sh-t">🧪 Overdue Routine Tests</div><div class="sh-a" onclick="showToast('Sending bulk reminders…')">Send All Reminders</div></div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="triage-item urgent" onclick="showToast('Opening Mehta Cold Storage monitoring record…')">
+          <div class="ti-ico">🏭</div>
+          <div style="flex:1;">
+            <div class="ti-title">Mehta Cold Storage</div>
+            <div class="ti-sub">Last test: 70 days ago. Water & hygiene swab required.</div>
+            <div class="ti-meta"><span class="badge b-red">70 Days Overdue</span><span class="sla-pill sla-urgent">⏱ Escalate</span></div>
+          </div>
+        </div>
+        <div class="triage-item warn" onclick="showToast('Opening Spice Garden monitoring record…')">
+          <div class="ti-ico">🌶️</div>
+          <div style="flex:1;">
+            <div class="ti-title">Spice Garden Restaurant</div>
+            <div class="ti-sub">Last test: 42 days ago. Monthly test due.</div>
+            <div class="ti-meta"><span class="badge b-amber">42 Days</span><span class="sla-pill sla-warn">⏱ Due</span></div>
+          </div>
+        </div>
+        <div class="triage-item warn" onclick="showToast('Opening Mountain Bakery monitoring record…')">
+          <div class="ti-ico">🥐</div>
+          <div style="flex:1;">
+            <div class="ti-title">Mountain Bakery</div>
+            <div class="ti-sub">Last test: 35 days ago. Food safety swab overdue.</div>
+            <div class="ti-meta"><span class="badge b-amber">35 Days</span><span class="sla-pill sla-warn">⏱ Overdue</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Test Results -->
+    <div class="card">
+      <div class="sh"><div class="sh-t">✅ Recent Submissions</div></div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="padding:12px;border-radius:10px;background:var(--greenLt);display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--green);">Green Valley Organics</div>
+            <div style="font-size:11px;color:var(--g500);margin-top:2px;">Water test · Hygiene swab · All PASS</div>
+          </div>
+          <span class="badge b-green">PASS</span>
+        </div>
+        <div style="padding:12px;border-radius:10px;background:var(--greenLt);display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--green);">Annapurna Catering</div>
+            <div style="font-size:11px;color:var(--g500);margin-top:2px;">Surface swab test · Submitted 20 Mar</div>
+          </div>
+          <span class="badge b-green">PASS</span>
+        </div>
+        <div style="padding:12px;border-radius:10px;background:var(--redLt);display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--red);">Raj Snacks Corner</div>
+            <div style="font-size:11px;color:var(--g500);margin-top:2px;">Water test failed coliform threshold</div>
+          </div>
+          <span class="badge b-red">FAIL</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Compliance Overview -->
+  <div class="card mt">
+    <div class="sh"><div class="sh-t">Compliance Overview by Zone</div></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+      <div style="text-align:center;padding:16px;border-radius:10px;background:var(--greenLt);">
+        <div style="font-size:22px;font-weight:800;color:var(--green);">87%</div>
+        <div style="font-size:11px;color:var(--g500);margin-top:4px;">Laitumkhrah Zone</div>
+        <div class="risk-track" style="margin-top:8px;"><div class="risk-fill" style="width:87%;background:var(--green)"></div></div>
+      </div>
+      <div style="text-align:center;padding:16px;border-radius:10px;background:var(--amberLt);">
+        <div style="font-size:22px;font-weight:800;color:var(--amberDk);">72%</div>
+        <div style="font-size:11px;color:var(--g500);margin-top:4px;">Police Bazar Zone</div>
+        <div class="risk-track" style="margin-top:8px;"><div class="risk-fill" style="width:72%;background:var(--amber)"></div></div>
+      </div>
+      <div style="text-align:center;padding:16px;border-radius:10px;background:var(--greenLt);">
+        <div style="font-size:22px;font-weight:800;color:var(--green);">91%</div>
+        <div style="font-size:11px;color:var(--g500);margin-top:4px;">Mawlai Zone</div>
+        <div class="risk-track" style="margin-top:8px;"><div class="risk-fill" style="width:91%;background:var(--green)"></div></div>
+      </div>
+      <div style="text-align:center;padding:16px;border-radius:10px;background:var(--redLt);">
+        <div style="font-size:22px;font-weight:800;color:var(--red);">58%</div>
+        <div style="font-size:11px;color:var(--g500);margin-top:4px;">Nongthymmai Zone</div>
+        <div class="risk-track" style="margin-top:8px;"><div class="risk-fill" style="width:58%;background:var(--red)"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ▌ INSPECTIONS ▌ -->
+<div class="page" id="page-inspections">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+    <div style="font-size:15px;font-weight:700;color:var(--navy);">Inspection Schedule</div>
+    <button class="btn btn-primary btn-sm" onclick="openAssignModal()">+ Schedule Inspection</button>
+  </div>
+  <div class="tab-bar">
+    <div class="tab-btn active" onclick="switchTab('insp','upcoming',this)">📅 Upcoming (8)</div>
+    <div class="tab-btn" onclick="switchTab('insp','overdue',this)">⚠️ Overdue (7)</div>
+    <div class="tab-btn" onclick="switchTab('insp','completed',this)">✅ Completed (34)</div>
+  </div>
+  <div class="tab-pane active" id="insp-tab-upcoming">
+    <div style="display:flex;flex-direction:column;gap:0;">
+      <div class="insp-card" onclick="showToast('Opening inspection details…')">
+        <div class="insp-date"><div class="insp-day">28</div><div class="insp-mon">Mar</div></div>
+        <div style="flex:1;">
+          <div class="insp-title">Annapurna Catering — Routine Annual Inspection</div>
+          <div class="insp-meta">Laitumkhrah, Shillong · Assigned to Priya Verma · State License</div>
+          <div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;"><span class="badge b-sage">Scheduled</span><span class="badge b-navy">Annual</span></div>
+        </div>
+        <button class="btn btn-ghost btn-xs" style="flex-shrink:0;" onclick="event.stopPropagation();showToast('Opening details…')">View →</button>
+      </div>
+      <div class="insp-card" onclick="showToast('Opening inspection details…')">
+        <div class="insp-date"><div class="insp-day">30</div><div class="insp-mon">Mar</div></div>
+        <div style="flex:1;">
+          <div class="insp-title">Raj Snacks Corner — Follow-up Inspection</div>
+          <div class="insp-meta">Police Bazar, Shillong · Assigned to Arun Mehta · Basic Registration</div>
+          <div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;"><span class="badge b-amber">Follow-up</span><span class="badge b-red">High Risk</span></div>
+        </div>
+        <button class="btn btn-ghost btn-xs" style="flex-shrink:0;" onclick="event.stopPropagation();showToast('Opening details…')">View →</button>
+      </div>
+      <div class="insp-card" onclick="showToast('Opening inspection details…')">
+        <div class="insp-date"><div class="insp-day">02</div><div class="insp-mon">Apr</div></div>
+        <div style="flex:1;">
+          <div class="insp-title">Meera Tiffin Service — Pre-Approval Inspection</div>
+          <div class="insp-meta">Mawlai, Shillong · Assigned to Sunita Rao · State License</div>
+          <div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;"><span class="badge b-blue">Pre-Approval</span><span class="badge b-navy">State License</span></div>
+        </div>
+        <button class="btn btn-ghost btn-xs" style="flex-shrink:0;" onclick="event.stopPropagation();showToast('Opening details…')">View →</button>
+      </div>
+    </div>
+  </div>
+  <div class="tab-pane" id="insp-tab-overdue">
+    <div class="card" style="padding:24px;">
+      <div style="background:var(--redLt);border-radius:10px;padding:14px;display:flex;gap:12px;align-items:center;margin-bottom:12px;">
+        <span style="font-size:24px;">⚠️</span>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--red);">7 inspections are overdue</div>
+          <div style="font-size:12px;color:var(--g600);margin-top:2px;line-height:1.5;">These were due before today. Please re-assign or escalate to your district head immediately.</div>
+        </div>
+        <button class="btn btn-red btn-sm" style="flex-shrink:0;" onclick="showToast('Escalation report sent to district head.')">Escalate All</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;" id="overdue-list">
+        <div style="padding:12px;border-radius:10px;border:1px solid var(--redLt);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <div><div style="font-size:13px;font-weight:700;color:var(--navy);">Mountain Bakery</div><div style="font-size:11px;color:var(--g500);">Was due 15 Mar · Still unassigned</div></div>
+          <button class="btn btn-ghost btn-xs" onclick="openAssignModal()">Re-assign →</button>
+        </div>
+        <div style="padding:12px;border-radius:10px;border:1px solid var(--redLt);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <div><div style="font-size:13px;font-weight:700;color:var(--navy);">Fresh Juice Hub</div><div style="font-size:11px;color:var(--g500);">Was due 10 Mar · Officer unavailable</div></div>
+          <button class="btn btn-ghost btn-xs" onclick="openAssignModal()">Re-assign →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="tab-pane" id="insp-tab-completed">
+    <div class="card" style="padding:24px;">
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="padding:12px;border-radius:10px;background:var(--greenLt);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--green);">Green Valley Organics — PASS</div>
+            <div style="font-size:11px;color:var(--g500);">Completed 20 Mar 2026 · Inspector: Priya Verma</div>
+          </div>
+          <button class="btn btn-ghost btn-xs" onclick="showToast('Opening inspection report…')">Report →</button>
+        </div>
+        <div style="padding:12px;border-radius:10px;background:var(--greenLt);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--green);">Krishna Sweets — PASS</div>
+            <div style="font-size:11px;color:var(--g500);">Completed 18 Mar 2026 · Inspector: Arun Mehta</div>
+          </div>
+          <button class="btn btn-ghost btn-xs" onclick="showToast('Opening inspection report…')">Report →</button>
+        </div>
+        <div style="padding:12px;border-radius:10px;background:var(--redLt);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--red);">Raj Snacks Corner — FAIL</div>
+            <div style="font-size:11px;color:var(--g500);">Completed 12 Mar 2026 · Follow-up scheduled</div>
+          </div>
+          <button class="btn btn-ghost btn-xs" onclick="showToast('Opening inspection report…')">Report →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PART 06 — GRIEVANCES + CLEAN KITCHEN LEAGUE + REPORTS + SETTINGS
+     ══════════════════════════════════════════════════════════════ -->
+
+<!-- ▌ GRIEVANCES ▌ -->
+<div class="page" id="page-grievances">
+  <div class="toolbar">
+    <div class="tb-inp"><span style="color:var(--g400)">🔍</span><input type="text" placeholder="Search grievances…" id="griev-search" oninput="renderGrievances()"/></div>
+    <div class="ftabs" id="griev-ftabs">
+      <div class="ft active" onclick="setFilt('griev','All',this)">All</div>
+      <div class="ft" onclick="setFilt('griev','Critical',this)">Critical</div>
+      <div class="ft" onclick="setFilt('griev','High',this)">High</div>
+      <div class="ft" onclick="setFilt('griev','Under Review',this)">Under Review</div>
+      <div class="ft" onclick="setFilt('griev','Resolved',this)">Resolved</div>
+    </div>
+  </div>
+  <div id="grievance-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+</div>
+
+<!-- ▌ CLEAN KITCHEN LEAGUE ▌ -->
+<div class="page" id="page-league">
+  <div style="margin-bottom:18px;">
+    <h2 style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--navy);margin-bottom:4px;">🏆 Clean Kitchen League</h2>
+    <p style="font-size:13px;color:var(--g500);">Monthly food safety and compliance rankings. Updated every 1st of the month.</p>
+  </div>
+
+  <!-- Top 3 podium -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:18px;">
+    <div class="lcard silver" style="margin-top:20px;">
+      <div class="lcard-rank">🥈</div>
+      <div style="font-size:28px;margin-bottom:8px;">🍱</div>
+      <div style="font-size:13px;font-weight:700;color:var(--navy);">Meera Tiffin Service</div>
+      <div style="font-size:11px;color:var(--g500);margin-top:2px;">State License · Mawlai</div>
+      <div class="lcard-score">94.2</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;"><span style="color:var(--g500);width:80px;flex-shrink:0;">Compliance</span><div style="flex:1;height:4px;background:var(--g100);border-radius:99px;overflow:hidden;"><div style="height:100%;width:96%;background:var(--sage);border-radius:99px;"></div></div><span style="color:var(--g700);font-weight:600;width:24px;text-align:right;">96</span></div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;"><span style="color:var(--g500);width:80px;flex-shrink:0;">Hygiene</span><div style="flex:1;height:4px;background:var(--g100);border-radius:99px;overflow:hidden;"><div style="height:100%;width:93%;background:var(--sage);border-radius:99px;"></div></div><span style="color:var(--g700);font-weight:600;width:24px;text-align:right;">93</span></div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;"><span style="color:var(--g500);width:80px;flex-shrink:0;">Consumer</span><div style="flex:1;height:4px;background:var(--g100);border-radius:99px;overflow:hidden;"><div style="height:100%;width:94%;background:var(--amber);border-radius:99px;"></div></div><span style="color:var(--g700);font-weight:600;width:24px;text-align:right;">94</span></div>
+      </div>
+    </div>
+
+    <div class="lcard gold" style="transform:scale(1.04);box-shadow:0 8px 32px rgba(0,0,0,.12);">
+      <div class="lcard-rank">🥇</div>
+      <div style="font-size:28px;margin-bottom:8px;">🍽️</div>
+      <div style="font-size:13px;font-weight:700;color:var(--navy);">Annapurna Catering</div>
+      <div style="font-size:11px;color:var(--g500);margin-top:2px;">State License · Laitumkhrah</div>
+      <div class="lcard-score">97.8</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;"><span style="color:var(--g500);width:80px;flex-shrink:0;">Compliance</span><div style="flex:1;height:4px;background:var(--g100);border-radius:99px;overflow:hidden;"><div style="height:100%;width:99%;background:var(--sage);border-radius:99px;"></div></div><span style="color:var(--g700);font-weight:600;width:24px;text-align:right;">99</span></div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;"><span style="color:var(--g500);width:80px;flex-shrink:0;">Hygiene</span><div style="flex:1;height:4px;background:var(--g100);border-radius:99px;overflow:hidden;"><div style="height:100%;width:97%;background:var(--sage);border-radius:99px;"></div></div><span style="color:var(--g700);font-weight:600;width:24px;text-align:right;">97</span></div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;"><span style="color:var(--g500);width:80px;flex-shrink:0;">Consumer</span><div style="flex:1;height:4px;background:var(--g100);border-radius:99px;overflow:hidden;"><div style="height:100%;width:98%;background:var(--amber);border-radius:99px;"></div></div><span style="color:var(--g700);font-weight:600;width:24px;text-align:right;">98</span></div>
+      </div>
+    </div>
+
+    <div class="lcard bronze" style="margin-top:20px;">
+      <div class="lcard-rank">🥉</div>
+      <div style="font-size:28px;margin-bottom:8px;">🥤</div>
+      <div style="font-size:13px;font-weight:700;color:var(--navy);">Fresh Juice Hub</div>
+      <div style="font-size:11px;color:var(--g500);margin-top:2px;">Basic Registration · Nongthymmai</div>
+      <div class="lcard-score">91.4</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;"><span style="color:var(--g500);width:80px;flex-shrink:0;">Compliance</span><div style="flex:1;height:4px;background:var(--g100);border-radius:99px;overflow:hidden;"><div style="height:100%;width:93%;background:var(--sage);border-radius:99px;"></div></div><span style="color:var(--g700);font-weight:600;width:24px;text-align:right;">93</span></div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;"><span style="color:var(--g500);width:80px;flex-shrink:0;">Hygiene</span><div style="flex:1;height:4px;background:var(--g100);border-radius:99px;overflow:hidden;"><div style="height:100%;width:89%;background:var(--sage);border-radius:99px;"></div></div><span style="color:var(--g700);font-weight:600;width:24px;text-align:right;">89</span></div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;"><span style="color:var(--g500);width:80px;flex-shrink:0;">Consumer</span><div style="flex:1;height:4px;background:var(--g100);border-radius:99px;overflow:hidden;"><div style="height:100%;width:92%;background:var(--amber);border-radius:99px;"></div></div><span style="color:var(--g700);font-weight:600;width:24px;text-align:right;">92</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full leaderboard table -->
+  <div class="card card-flush">
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Rank</th><th>Business</th><th>Category</th><th>Compliance</th><th>Hygiene</th><th>Consumer Rating</th><th>Score</th><th>Change</th></tr></thead>
+      <tbody>
+        <tr><td><strong>1</strong> 🥇</td><td><strong>Annapurna Catering</strong></td><td>State License</td><td><span class="badge b-green">99</span></td><td><span class="badge b-green">97</span></td><td>⭐ 4.5</td><td><strong style="color:var(--navy);">97.8</strong></td><td style="color:var(--green);font-size:11px;">▲ 2</td></tr>
+        <tr><td><strong>2</strong> 🥈</td><td><strong>Meera Tiffin Service</strong></td><td>State License</td><td><span class="badge b-green">96</span></td><td><span class="badge b-green">93</span></td><td>⭐ 4.1</td><td><strong style="color:var(--navy);">94.2</strong></td><td style="color:var(--g400);font-size:11px;">— 0</td></tr>
+        <tr><td><strong>3</strong> 🥉</td><td><strong>Fresh Juice Hub</strong></td><td>Basic Reg.</td><td><span class="badge b-green">93</span></td><td><span class="badge b-sage">89</span></td><td>⭐ 4.2</td><td><strong style="color:var(--navy);">91.4</strong></td><td style="color:var(--green);font-size:11px;">▲ 1</td></tr>
+        <tr><td><strong>4</strong></td><td>Spice Garden Restaurant</td><td>State License</td><td><span class="badge b-amber">78</span></td><td><span class="badge b-amber">80</span></td><td>⭐ 3.8</td><td>79.0</td><td style="color:var(--red);font-size:11px;">▼ 1</td></tr>
+        <tr><td><strong>5</strong></td><td>Mountain Bakery</td><td>Basic Reg.</td><td><span class="badge b-amber">75</span></td><td><span class="badge b-amber">72</span></td><td>⭐ 3.9</td><td>74.5</td><td style="color:var(--g400);font-size:11px;">— 0</td></tr>
+        <tr><td><strong>6</strong></td><td>Raj Snacks Corner</td><td>Basic Reg.</td><td><span class="badge b-red">45</span></td><td><span class="badge b-red">48</span></td><td>⭐ 2.9</td><td>46.8</td><td style="color:var(--red);font-size:11px;">▼ 3</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ▌ REPORTS ▌ -->
+<div class="page" id="page-reports">
+  <div style="margin-bottom:18px;">
+    <h2 style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--navy);margin-bottom:4px;">Reports &amp; Analytics</h2>
+    <p style="font-size:13px;color:var(--g500);">Generate and download compliance, inspection, and licensing reports.</p>
+  </div>
+  <div class="g3">
+    <div class="card" style="cursor:pointer;" onclick="showToast('Generating Licensing Activity Report…')">
+      <div style="font-size:32px;margin-bottom:12px;">📋</div>
+      <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px;">Licensing Activity</div>
+      <div style="font-size:12px;color:var(--g500);line-height:1.5;margin-bottom:14px;">Applications filed, approved, rejected by month. Category breakdown and trends.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();showToast('Opening preview…')">Preview</button>
+        <button class="btn btn-primary btn-xs" onclick="event.stopPropagation();showToast('Downloading PDF…')">⬇ Download PDF</button>
+      </div>
+    </div>
+    <div class="card" style="cursor:pointer;" onclick="showToast('Generating Compliance Summary Report…')">
+      <div style="font-size:32px;margin-bottom:12px;">🧪</div>
+      <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px;">Compliance Summary</div>
+      <div style="font-size:12px;color:var(--g500);line-height:1.5;margin-bottom:14px;">Test results, overdue businesses, zone-wise compliance rates and risk distribution.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();showToast('Opening preview…')">Preview</button>
+        <button class="btn btn-primary btn-xs" onclick="event.stopPropagation();showToast('Downloading PDF…')">⬇ Download PDF</button>
+      </div>
+    </div>
+    <div class="card" style="cursor:pointer;" onclick="showToast('Generating Inspection Report…')">
+      <div style="font-size:32px;margin-bottom:12px;">🔍</div>
+      <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px;">Inspection Report</div>
+      <div style="font-size:12px;color:var(--g500);line-height:1.5;margin-bottom:14px;">Completed inspections, pass/fail rates, overdue, and officer performance.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();showToast('Opening preview…')">Preview</button>
+        <button class="btn btn-primary btn-xs" onclick="event.stopPropagation();showToast('Downloading PDF…')">⬇ Download PDF</button>
+      </div>
+    </div>
+    <div class="card" style="cursor:pointer;" onclick="showToast('Generating Grievances Report…')">
+      <div style="font-size:32px;margin-bottom:12px;">💬</div>
+      <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px;">Grievances Report</div>
+      <div style="font-size:12px;color:var(--g500);line-height:1.5;margin-bottom:14px;">Complaint volumes, resolution times, priority breakdown, and FBO-level risk flags.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();showToast('Opening preview…')">Preview</button>
+        <button class="btn btn-primary btn-xs" onclick="event.stopPropagation();showToast('Downloading PDF…')">⬇ Download PDF</button>
+      </div>
+    </div>
+    <div class="card" style="cursor:pointer;" onclick="showToast('Generating Annual Returns Report…')">
+      <div style="font-size:32px;margin-bottom:12px;">📅</div>
+      <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px;">Annual Returns Status</div>
+      <div style="font-size:12px;color:var(--g500);line-height:1.5;margin-bottom:14px;">Filed vs pending annual returns, non-compliant businesses, pending notices.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();showToast('Opening preview…')">Preview</button>
+        <button class="btn btn-primary btn-xs" onclick="event.stopPropagation();showToast('Downloading PDF…')">⬇ Download PDF</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ▌ SETTINGS ▌ -->
+<div class="page" id="page-settings">
+  <div style="max-width:600px;">
+    <h2 style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--navy);margin-bottom:18px;">Settings &amp; Profile</h2>
+
+    <div class="card" style="margin-bottom:14px;">
+      <div class="sh"><div class="sh-t">Officer Profile</div><button class="btn btn-ghost btn-xs" onclick="showToast('Edit mode coming soon')">Edit</button></div>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+        <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--navyDk));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:20px;" id="profile-avatar-lg">RK</div>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:var(--navy);" id="profile-name">Rajesh Kumar</div>
+          <div style="font-size:12px;color:var(--g500);" id="profile-role">Senior FSSAI Officer · Meghalaya Region</div>
+          <div style="font-size:12px;color:var(--g400);" id="profile-mobile">+91 98765 43210</div>
+        </div>
+      </div>
+      <div class="info-grid">
+        <div><div class="if-lbl">Officer ID</div><div class="if-val" id="profile-id">OFF-MEG-2024-001</div></div>
+        <div><div class="if-lbl">Zone</div><div class="if-val">East Khasi Hills</div></div>
+        <div><div class="if-lbl">Designation</div><div class="if-val">Senior Food Safety Officer</div></div>
+        <div><div class="if-lbl">Cases This Month</div><div class="if-val">23</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px;">
+      <div class="sh"><div class="sh-t">Notifications</div></div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div><div style="font-size:13px;font-weight:600;color:var(--navy);">New Applications</div><div style="font-size:11px;color:var(--g500);">Get notified when new applications are assigned to you</div></div>
+          <input type="checkbox" checked style="width:18px;height:18px;accent-color:var(--sage);cursor:pointer;"/>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div><div style="font-size:13px;font-weight:600;color:var(--navy);">SLA Warnings</div><div style="font-size:11px;color:var(--g500);">Alert when cases are approaching SLA deadline</div></div>
+          <input type="checkbox" checked style="width:18px;height:18px;accent-color:var(--sage);cursor:pointer;"/>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div><div style="font-size:13px;font-weight:600;color:var(--navy);">High-Priority Grievances</div><div style="font-size:11px;color:var(--g500);">Immediate alert for critical complaints</div></div>
+          <input type="checkbox" checked style="width:18px;height:18px;accent-color:var(--sage);cursor:pointer;"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sh"><div class="sh-t">Account</div></div>
+      <button class="btn btn-red btn-sm" onclick="officerLogout()">Log Out</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- close #main-inner -->
+</main><!-- close #main -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script type="module">
+// ═══════════════════════════════════════════════════════════════
+//  FoSCoS — Officer Portal JS Module
+//  Credentials loaded from /api/config — never hardcoded
+// ═══════════════════════════════════════════════════════════════
+
+import { initializeApp }    from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+import { getAuth, signInWithPhoneNumber, RecaptchaVerifier } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+
+// ── Data ───────────────────────────────────────────────────────
+const SAMPLE_APPS = [
+  { id:'app-001', app_number:'FSSAI-2026-38642', name:'Annapurna Catering',     cat:'State License',      date:'2026-03-12', status:'under_review', step:3, flagged:false },
+  { id:'app-002', app_number:'FSSAI-2026-12891', name:'Raj Snacks Corner',      cat:'Basic Registration', date:'2026-03-18', status:'docs_review',  step:2, flagged:true,  flagReason:'Water test report unclear' },
+  { id:'app-003', app_number:'FSSAI-2026-55021', name:'Meera Tiffin Service',   cat:'State License',      date:'2026-03-20', status:'submitted',    step:1, flagged:false },
+  { id:'app-004', app_number:'FSSAI-2026-77103', name:'Fresh Juice Hub',        cat:'Basic Registration', date:'2026-03-22', status:'approved',     step:5, flagged:false },
+  { id:'app-005', app_number:'FSSAI-2026-33910', name:'Spice Garden Restaurant',cat:'State License',      date:'2026-03-25', status:'submitted',    step:1, flagged:false },
+  { id:'app-006', app_number:'FSSAI-2026-44201', name:'Mountain Bakery',        cat:'Basic Registration', date:'2026-03-28', status:'docs_review',  step:2, flagged:false },
+];
+
+const SAMPLE_FBOS = [
+  { fssai:'2026 0303 1083 8642', name:'Annapurna Catering',  type:'Restaurant',   loc:'Shillong', emoji:'🍽️', compliance:'High',   risk:'Low',    expiry:'2027-03-12' },
+  { fssai:'2024 1201 5842 1109', name:'Raj Snacks Corner',   type:'Snack Stall',  loc:'Shillong', emoji:'🥙', compliance:'Medium', risk:'Medium', expiry:'2026-12-01' },
+  { fssai:'2025 0606 2291 4403', name:'Meera Tiffin',        type:'Tiffin',       loc:'Shillong', emoji:'🍱', compliance:'High',   risk:'Low',    expiry:'2027-06-06' },
+  { fssai:'2025 1104 3318 2201', name:'Fresh Juice Hub',     type:'Juice Bar',    loc:'Shillong', emoji:'🥤', compliance:'High',   risk:'Low',    expiry:'2027-11-04' },
+  { fssai:'2023 0812 4412 7102', name:'Spice Garden',        type:'Restaurant',   loc:'Shillong', emoji:'🌶️', compliance:'Medium', risk:'Medium', expiry:'2026-08-12' },
+  { fssai:'2022 0415 8821 0033', name:'Mountain Bakery',     type:'Bakery',       loc:'Shillong', emoji:'🥐', compliance:'Medium', risk:'High',   expiry:'2026-04-15' },
+];
+
+const SAMPLE_GRIEVANCES = [
+  { id:'grv-001', complaint_id:'GRV-2026-00142', fbo_name:'Raj Snacks Corner',   issue:'Foreign object found in food',  priority:'critical', status:'submitted',    filed:'2026-03-20' },
+  { id:'grv-002', complaint_id:'GRV-2026-00139', fbo_name:'Annapurna Catering',  issue:'Hygiene concerns — staff gloves',priority:'high',     status:'under_review', filed:'2026-03-18' },
+  { id:'grv-003', complaint_id:'GRV-2026-00128', fbo_name:'Spice Garden',        issue:'Gastric illness after meal',     priority:'high',     status:'under_review', filed:'2026-03-15' },
+  { id:'grv-004', complaint_id:'GRV-2026-00101', fbo_name:'Mountain Bakery',     issue:'Expired products on display',    priority:'medium',   status:'resolved',     filed:'2026-03-10' },
+  { id:'grv-005', complaint_id:'GRV-2026-00098', fbo_name:'Meera Tiffin',        issue:'Pest sighting in kitchen area',  priority:'high',     status:'under_review', filed:'2026-03-08' },
+];
+
+const STATUS_BADGE = {
+  submitted:    '<span class="badge b-navy">Submitted</span>',
+  docs_review:  '<span class="badge b-amber">Docs Review</span>',
+  under_review: '<span class="badge b-amber">Under Review</span>',
+  approved:     '<span class="badge b-green">Approved</span>',
+  rejected:     '<span class="badge b-red">Rejected</span>',
+};
+
+const STEP_LABELS = ['','Submitted','Docs Review','Under Review','Inspection','Approved'];
+
+// ── State ──────────────────────────────────────────────────────
+let auth, supabaseClient;
+let officerToken = null;
+let _officerConfirmResult = null;
+let _currentAppId = null;
+let _appFilt = 'All', _grievFilt = 'All', _fboFilt = 'All';
+let _appRealtimeChannel = null;
+
+// ── Bootstrap ──────────────────────────────────────────────────
+async function initServices() {
+  try {
+    const res = await fetch('/api/config');
+    if (!res.ok) throw new Error('Config unavailable');
+    const cfg = await res.json();
+    const fbApp = initializeApp(cfg.firebase);
+    auth = getAuth(fbApp);
+    supabaseClient = window.supabase.createClient(cfg.supabase.url, cfg.supabase.anon_key);
+  } catch(e) { auth = null; supabaseClient = null; }
+}
+
+function authFetch(url, opts = {}) {
+  if (!opts.headers) opts.headers = {};
+  if (officerToken) opts.headers['Authorization'] = 'Bearer ' + officerToken;
+  return fetch(url, opts);
+}
+
+// ── Officer Auth ───────────────────────────────────────────────
+async function officerSendOTP() {
+  const mobile = document.getElementById('officer-mobile')?.value.trim();
+  if (!mobile || mobile.length !== 10) { alert('Enter a valid 10-digit mobile number.'); return; }
+  const dispEl = document.getElementById('officer-mobile-disp');
+  if (dispEl) dispEl.textContent = mobile;
+
+  if (!auth) { showLoginStep2(); return; }
+  try {
+    const verifier = new RecaptchaVerifier(auth, 'officer-recaptcha', { size:'invisible' });
+    _officerConfirmResult = await signInWithPhoneNumber(auth, '+91' + mobile, verifier);
+  } catch(e) {}
+  showLoginStep2();
+}
+
+function showLoginStep2() {
+  document.getElementById('officer-login-p1').style.display = 'none';
+  document.getElementById('officer-login-p2').style.display = 'block';
+}
+
+async function officerVerifyOTP() {
+  const otp = [1,2,3,4,5,6].map(i => document.getElementById('oo' + i)?.value || '').join('');
+  const errEl = document.getElementById('officer-otp-err');
+
+  const proceed = async (idToken) => {
+    try {
+      const res = await fetch('/api/auth/verify', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ id_token: idToken || 'mock_officer_token', role:'officer' }),
+      });
+      if (res.ok) {
+        const d = await res.json();
+        officerToken = d.token || 'mock_officer_token';
+        const user = d.user || {};
+        localStorage.setItem('officer_token', officerToken);
+        localStorage.setItem('officer_user', JSON.stringify(user));
+        updateOfficerProfile(user);
+      }
+    } catch(_) {
+      officerToken = 'mock_officer_token';
+    }
+    enterPortal();
+  };
+
+  if (!_officerConfirmResult || !auth) { await proceed(null); return; }
+  if (otp.length < 6) { if (errEl) errEl.style.display = 'block'; return; }
+
+  try {
+    const cred = await _officerConfirmResult.confirm(otp);
+    if (errEl) errEl.style.display = 'none';
+    await proceed(await cred.user.getIdToken());
+  } catch(e) {
+    if (errEl) errEl.style.display = 'block';
+  }
+}
+
+function officerOtpAdv(n) {
+  if (n < 6) {
+    const curr = document.getElementById('oo' + n);
+    const next = document.getElementById('oo' + (n + 1));
+    if (curr?.value && next) next.focus();
+  }
+}
+
+function updateOfficerProfile(user) {
+  const name  = user.name  || 'Officer';
+  const role  = user.role  || 'FSSAI Officer';
+  const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2) || 'OF';
+
+  ['officer-avatar', 'profile-avatar-lg'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = initials;
+  });
+  const nameEls = ['officer-name-sb', 'profile-name'];
+  nameEls.forEach(id => { const el = document.getElementById(id); if (el) el.textContent = name; });
+  const roleEl = document.getElementById('officer-role-sb');
+  if (roleEl) roleEl.textContent = role;
+}
+
+// URL slug ↔ internal page-id mapping
+const URL_TO_PAGE = { queue:'myqueue' };
+const PAGE_TO_URL = { myqueue:'queue' };
+
+function enterPortal() {
+  const login = document.getElementById('officer-login-page');
+  if (login) login.classList.add('hidden');
+  startClock();
+  renderApps();
+  renderFBO();
+  renderGrievances();
+  initCharts();
+
+  // Navigate to the page matching the current URL (or default to dashboard)
+  const slug = window.location.pathname.replace(/^\/officer\/?/, '') || 'dashboard';
+  const page = URL_TO_PAGE[slug] || slug;
+  navigate(page, true);
+}
+
+function officerLogout() {
+  localStorage.removeItem('officer_token');
+  localStorage.removeItem('officer_user');
+  window.location.href = '/officer';
+}
+
+// ── Navigation ─────────────────────────────────────────────────
+// fromPopstate=true skips pushState (browser already handled it)
+function navigate(page, fromPopstate) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById('page-' + page);
+  if (target) target.classList.add('active');
+
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  const sbItem = document.querySelector(`.sb-item[data-page="${page}"]`);
+  if (sbItem) sbItem.classList.add('active');
+
+  const titles = {
+    dashboard:'Dashboard', myqueue:'My Queue', applications:'Applications',
+    fbo:'FBO Directory', monitoring:'Routine Monitoring', inspections:'Inspections',
+    grievances:'Grievances', league:'Clean Kitchen League', reports:'Reports',
+    settings:'Settings & Profile',
+  };
+  const titleEl = document.getElementById('pg-title');
+  if (titleEl) titleEl.textContent = titles[page] || page;
+
+  closeAppDetail();
+  closeFBOProfile();
+
+  if (page === 'dashboard') loadOfficerDashboard();
+
+  // Update browser URL
+  if (!fromPopstate) {
+    const slug = PAGE_TO_URL[page] || page;
+    const newPath = '/officer/' + slug;
+    if (window.location.pathname !== newPath) {
+      history.pushState({ page }, '', newPath);
+    }
+  }
+}
+
+// Back/forward button support
+window.addEventListener('popstate', e => {
+  const page = e.state?.page;
+  if (page) navigate(page, true);
+});
+
+// ── Dashboard ──────────────────────────────────────────────────
+async function loadOfficerDashboard() {
+  const dateEl = document.getElementById('dash-date-label');
+  if (dateEl) dateEl.textContent = new Date().toLocaleDateString('en-IN', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+
+  try {
+    const res = await authFetch('/api/officer/stats');
+    if (res.ok) {
+      const d = await res.json();
+      const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+      set('dash-stat-pending',   d.pending_applications || 127);
+      set('dash-stat-delayed',   d.delayed_cases        || 34);
+      set('dash-stat-approved',  d.approved_licenses    || 892);
+      set('dash-stat-grievances',d.open_grievances      || 5);
+    }
+  } catch(_) {}
+}
+
+// ── Applications ───────────────────────────────────────────────
+function renderApps() {
+  const tbody = document.getElementById('app-tbody');
+  if (!tbody) return;
+  const search = (document.getElementById('app-search')?.value || '').toLowerCase();
+  const filt   = _appFilt;
+
+  const filtered = SAMPLE_APPS.filter(a => {
+    const matchSearch = !search || a.name.toLowerCase().includes(search) || a.app_number.includes(search);
+    const statusMap = { 'New':'submitted', 'Pending':'docs_review', 'Approved':'approved', 'Delayed':'under_review' };
+    const matchFilt = filt === 'All' || a.status === statusMap[filt] || (filt === 'Delayed' && a.flagged);
+    return matchSearch && matchFilt;
+  });
+
+  tbody.innerHTML = filtered.map(a => `
+    <tr onclick="openAppDetail('${a.id}')" class="${a.flagged ? 'row-flag' : ''}">
+      <td><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--g400)">${a.app_number}</span></td>
+      <td><strong>${a.name}</strong>${a.flagged ? ' <span class="badge b-red">Flagged</span>' : ''}</td>
+      <td>${a.cat}</td>
+      <td style="color:var(--g500);font-size:12px;">${a.date}</td>
+      <td><span class="badge ${a.step >= 5 ? 'b-green' : a.step >= 3 ? 'b-amber' : 'b-navy'}">Step ${a.step} — ${STEP_LABELS[a.step]}</span></td>
+      <td>${STATUS_BADGE[a.status] || a.status}</td>
+      <td style="color:var(--g500);font-size:12px;">Rajesh K.</td>
+      <td><button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();openAppDetail('${a.id}')">Review →</button></td>
+    </tr>`).join('');
+}
+
+function openAppDetail(appId) {
+  const app = SAMPLE_APPS.find(a => a.id === appId);
+  if (!app) return;
+  _currentAppId = appId;
+
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const detPage = document.getElementById('app-detail-page');
+  if (detPage) detPage.classList.add('active');
+
+  // Header
+  const hd = document.getElementById('app-det-hd');
+  if (hd) hd.innerHTML = `
+    <div style="width:48px;height:48px;border-radius:12px;background:var(--navyLt);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🏪</div>
+    <div style="flex:1;">
+      <div style="font-size:16px;font-weight:700;color:var(--navy);">${app.name}</div>
+      <div style="font-size:12px;color:var(--g500);margin-top:2px;">${app.cat} · ${app.app_number}</div>
+      <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
+        ${STATUS_BADGE[app.status] || ''}
+        ${app.flagged ? '<span class="badge b-red">🚩 Flagged</span>' : ''}
+        <span class="badge b-grey">Filed ${app.date}</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0;">
+      <button class="btn btn-sage btn-sm" onclick="updateAppStatus('${app.id}','approved')">✅ Approve</button>
+      <button class="btn btn-red btn-sm" onclick="updateAppStatus('${app.id}','rejected')">❌ Reject</button>
+      <button class="btn btn-ghost btn-sm" onclick="openFlagModal('${app.id}')">🚩 Flag</button>
+      <button class="btn btn-ghost btn-sm" onclick="openAssignModal()">🔍 Assign Inspection</button>
+    </div>`;
+
+  // Pipeline
+  const pipeline = document.getElementById('app-pipeline');
+  if (pipeline) {
+    const steps = ['Submitted','Docs Review','Under Review','Inspection','Approved'];
+    pipeline.innerHTML = steps.map((lbl, i) => {
+      const cls = i + 1 < app.step ? 'done' : i + 1 === app.step ? 'active' : '';
+      return `<div class="pipe-step ${cls}"><div class="pipe-dot">${i + 1 < app.step ? '✓' : i + 1}</div><div class="pipe-lbl">${lbl}</div></div>${i < 4 ? '' : ''}`;
+    }).join('');
+  }
+
+  // Info tab
+  const info = document.getElementById('appdet-info-content');
+  if (info) info.innerHTML = `
+    <div class="info-grid" style="margin-bottom:16px;">
+      <div><div class="if-lbl">Business Name</div><div class="if-val">${app.name}</div></div>
+      <div><div class="if-lbl">Category</div><div class="if-val">${app.cat}</div></div>
+      <div><div class="if-lbl">Application No.</div><div class="if-val" style="font-family:'DM Mono',monospace;font-size:12px;">${app.app_number}</div></div>
+      <div><div class="if-lbl">Date Filed</div><div class="if-val">${app.date}</div></div>
+      <div><div class="if-lbl">Current Step</div><div class="if-val">Step ${app.step} — ${STEP_LABELS[app.step]}</div></div>
+      <div><div class="if-lbl">Assigned Officer</div><div class="if-val">Rajesh Kumar</div></div>
+    </div>`;
+
+  // Docs tab
+  const docs = document.getElementById('appdet-docs-content');
+  if (docs) {
+    const sampleDocs = [
+      { id:'doc-1', label:'Photo Identity Proof', status:'approved', note:'' },
+      { id:'doc-2', label:'Address / Premises Proof', status:'approved', note:'' },
+      { id:'doc-3', label:'List of Food Items', status:'pending', note:'' },
+      { id:'doc-4', label:'Geotagged Premises Photo', status: app.flagged ? 'rejected' : 'pending', note: app.flagged ? 'Image quality insufficient — please re-upload a clearer photo' : '' },
+    ];
+    docs.innerHTML = sampleDocs.map(d => `
+      <div class="doc-item" data-doc-id="${d.id}">
+        <div class="doc-ico">📄</div>
+        <div class="doc-name">${d.label}</div>
+        <div class="doc-actions">
+          <button class="btn btn-ghost btn-xs" onclick="getSignedURL('${d.id}')">👁 View</button>
+          <button class="btn btn-green btn-xs" onclick="reviewDocument('${d.id}','approved','')">✓ Approve</button>
+          <button class="btn btn-red btn-xs" onclick="openDocRejectDialog('${d.id}')">✗ Flag</button>
+        </div>
+        ${d.status === 'rejected' && d.note ? `<div class="note-box" style="margin-top:6px;width:100%;">⚠️ ${d.note}</div>` : ''}
+      </div>`).join('');
+  }
+
+  // Audit trail
+  const trail = document.getElementById('appdet-trail-content');
+  if (trail) trail.innerHTML = `
+    <div class="audit-item"><div class="audit-dot" style="background:var(--navy)">📋</div><div class="audit-body"><div class="audit-action">Application Submitted</div><div class="audit-meta">${app.date} · Applicant</div></div></div>
+    <div class="audit-item"><div class="audit-dot" style="background:var(--amber)">🔍</div><div class="audit-body"><div class="audit-action">Document Review Started</div><div class="audit-meta">${app.date} · Rajesh Kumar (Officer)</div></div></div>
+    ${app.flagged ? `<div class="audit-item"><div class="audit-dot" style="background:var(--red)">🚩</div><div class="audit-body"><div class="audit-action">Application Flagged</div><div class="audit-meta">Today · Rajesh Kumar<div class="audit-note">${app.flagReason || 'Requires clarification'}</div></div></div></div>` : ''}`;
+
+  // Flag history
+  const flags = document.getElementById('appdet-flags-content');
+  if (flags) flags.innerHTML = app.flagged
+    ? `<div class="flag-history-item"><strong>🚩 Flagged</strong> — ${app.flagReason || 'See notes'}<br/><span style="font-size:10px;color:var(--g400)">Today · Rajesh Kumar</span></div>`
+    : '<div class="empty"><div class="empty-ico">🏳️</div>No flags on this application</div>';
+
+  // Subscribe realtime if available
+  if (supabaseClient && appId !== 'mock') {
+    if (_appRealtimeChannel) supabaseClient.removeChannel(_appRealtimeChannel);
+    _appRealtimeChannel = supabaseClient.channel('officer-docs-' + appId)
+      .on('postgres_changes', { event:'UPDATE', schema:'public', table:'documents', filter:`application_id=eq.${appId}` },
+        payload => showToast('Document updated: ' + payload.new.doc_key))
+      .subscribe();
+  }
+}
+
+function closeAppDetail() {
+  const det = document.getElementById('app-detail-page');
+  if (det) det.classList.remove('active');
+}
+
+async function reviewDocument(docId, status, note) {
+  const btn = event?.target;
+  if (btn) btn.disabled = true;
+  try {
+    await authFetch(`/api/officer/documents/${docId}/review`, {
+      method:'PATCH', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ status, officer_note: note }),
+    });
+  } catch(_) {}
+  showToast(status === 'approved' ? '✅ Document approved' : '❌ Document flagged — applicant notified');
+  if (btn) btn.disabled = false;
+}
+
+function openDocRejectDialog(docId) {
+  const note = prompt('Enter rejection note for the applicant:');
+  if (note !== null) reviewDocument(docId, 'rejected', note);
+}
+
+async function getSignedURL(docId) {
+  showToast('Fetching document…');
+  try {
+    const res = await authFetch(`/api/officer/documents/${docId}/signed-url`);
+    if (res.ok) {
+      const d = await res.json();
+      if (d.url) window.open(d.url, '_blank');
+    }
+  } catch(_) {}
+  showToast('Opening document viewer…');
+}
+
+async function updateAppStatus(appId, status) {
+  try {
+    await authFetch(`/api/officer/applications/${appId}/status`, {
+      method:'PATCH', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ status }),
+    });
+  } catch(_) {}
+  showToast(status === 'approved' ? '✅ Application approved! Applicant notified.' : '❌ Application rejected. Reason sent to applicant.');
+  const app = SAMPLE_APPS.find(a => a.id === appId);
+  if (app) { app.status = status; app.step = status === 'approved' ? 5 : app.step; }
+  closeAppDetail();
+  renderApps();
+}
+
+function setFilt(type, filt, btn) {
+  if (type === 'app')   { _appFilt   = filt; document.querySelectorAll('#app-ftabs .ft').forEach(b => b.classList.remove('active')); }
+  if (type === 'griev') { _grievFilt = filt; document.querySelectorAll('#griev-ftabs .ft').forEach(b => b.classList.remove('active')); }
+  if (type === 'fbo')   { _fboFilt   = filt; }
+  if (btn) btn.classList.add('active');
+  if (type === 'app')   renderApps();
+  if (type === 'griev') renderGrievances();
+  if (type === 'fbo')   renderFBO();
+}
+
+// ── FBO Directory ──────────────────────────────────────────────
+function renderFBO() {
+  const tbody = document.getElementById('fbo-tbody');
+  if (!tbody) return;
+  const search = (document.getElementById('fbo-search')?.value || '').toLowerCase();
+
+  const filtered = SAMPLE_FBOS.filter(f => !search || f.name.toLowerCase().includes(search) || f.fssai.includes(search) || f.loc.toLowerCase().includes(search));
+
+  const complianceColor = { High:'b-green', Medium:'b-amber', Low:'b-red' };
+  const riskColor       = { Low:'b-green',  Medium:'b-amber', High:'b-red' };
+
+  tbody.innerHTML = filtered.map(f => `
+    <tr onclick="openFBOProfile('${f.fssai}')">
+      <td><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--g400)">${f.fssai}</span></td>
+      <td><strong>${f.emoji} ${f.name}</strong></td>
+      <td style="font-size:12px;color:var(--g600);">${f.type}</td>
+      <td style="font-size:12px;color:var(--g500);">${f.loc}</td>
+      <td><span class="badge ${complianceColor[f.compliance] || 'b-grey'}">${f.compliance}</span></td>
+      <td><span class="badge ${riskColor[f.risk] || 'b-grey'}">${f.risk}</span></td>
+      <td style="font-size:12px;color:var(--g500);">${f.expiry}</td>
+      <td><button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();openFBOProfile('${f.fssai}')">View →</button></td>
+    </tr>`).join('');
+}
+
+function openFBOProfile(fssai) {
+  const fbo = SAMPLE_FBOS.find(f => f.fssai === fssai);
+  if (!fbo) return;
+
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const page = document.getElementById('fbo-profile-page');
+  if (page) page.classList.add('active');
+
+  const content = document.getElementById('fbo-profile-content');
+  if (content) content.innerHTML = `
+    <div class="fbo-prof-hd">
+      <div class="fbo-logo-lg">${fbo.emoji}</div>
+      <div style="flex:1;">
+        <div style="font-size:18px;font-weight:700;color:var(--navy);">${fbo.name}</div>
+        <div style="font-size:12px;color:var(--g500);margin-top:3px;font-family:'DM Mono',monospace;">FSSAI: ${fbo.fssai}</div>
+        <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="badge b-green">● Active</span>
+          <span class="badge b-navy">${fbo.type}</span>
+          <span class="badge b-grey">${fbo.loc}</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0;">
+        <button class="btn btn-primary btn-sm" onclick="openAssignModal()">🔍 Schedule Inspection</button>
+        <button class="btn btn-ghost btn-sm" onclick="showToast('Viewing license history…')">📋 History</button>
+      </div>
+    </div>
+    <div class="g3">
+      <div class="card"><div style="font-size:11px;color:var(--g500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Compliance Score</div><div style="font-size:24px;font-weight:700;color:var(--navy);">${fbo.compliance === 'High' ? '92' : fbo.compliance === 'Medium' ? '74' : '48'}</div><div class="risk-track" style="margin-top:6px;"><div class="risk-fill" style="width:${fbo.compliance === 'High' ? 92 : fbo.compliance === 'Medium' ? 74 : 48}%;background:${fbo.compliance === 'High' ? 'var(--green)' : fbo.compliance === 'Medium' ? 'var(--amber)' : 'var(--red)'}"></div></div></div>
+      <div class="card"><div style="font-size:11px;color:var(--g500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">License Expiry</div><div style="font-size:16px;font-weight:700;color:var(--navy);">${fbo.expiry}</div><div style="font-size:12px;color:var(--g500);margin-top:4px;">${Math.ceil((new Date(fbo.expiry) - Date.now()) / 86400000)} days left</div></div>
+      <div class="card"><div style="font-size:11px;color:var(--g500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Risk Level</div><div style="font-size:16px;font-weight:700;color:var(--navy);">${fbo.risk}</div><span class="badge ${fbo.risk === 'Low' ? 'b-green' : fbo.risk === 'Medium' ? 'b-amber' : 'b-red'}" style="margin-top:6px;display:inline-flex;">${fbo.risk} Risk</span></div>
+    </div>`;
+}
+
+function closeFBOProfile() {
+  const p = document.getElementById('fbo-profile-page');
+  if (p) p.classList.remove('active');
+}
+
+// ── Grievances ─────────────────────────────────────────────────
+function renderGrievances() {
+  const list = document.getElementById('grievance-list');
+  if (!list) return;
+  const search = (document.getElementById('griev-search')?.value || '').toLowerCase();
+  const filt   = _grievFilt;
+
+  const filtered = SAMPLE_GRIEVANCES.filter(g => {
+    const matchSearch = !search || g.fbo_name.toLowerCase().includes(search) || g.complaint_id.includes(search) || g.issue.toLowerCase().includes(search);
+    const matchFilt   = filt === 'All' || g.priority === filt.toLowerCase() || g.status === filt.toLowerCase().replace(' ', '_');
+    return matchSearch && matchFilt;
+  });
+
+  const priorityColor = { critical:'b-red', high:'b-amber', medium:'b-navy', low:'b-grey' };
+
+  list.innerHTML = filtered.map(g => `
+    <div class="griev-card" onclick="openGrievanceDetail('${g.id}')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--navy);">${g.issue}</div>
+          <div class="gc-id">${g.complaint_id} · ${g.fbo_name}</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+          <span class="badge ${priorityColor[g.priority] || 'b-grey'}">${g.priority.charAt(0).toUpperCase() + g.priority.slice(1)}</span>
+          <span class="badge ${g.status === 'resolved' ? 'b-green' : 'b-amber'}">${g.status === 'resolved' ? '✅ Resolved' : '⏳ ' + g.status.replace('_',' ')}</span>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;flex-wrap:wrap;gap:8px;">
+        <div style="font-size:11px;color:var(--g400);">Filed ${g.filed}</div>
+        <div style="display:flex;gap:6px;">
+          ${g.status !== 'resolved' ? `<button class="btn btn-green btn-xs" onclick="event.stopPropagation();resolveGrievance('${g.id}')">✓ Resolve</button>` : ''}
+          <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();openGrievanceDetail('${g.id}')">View →</button>
+        </div>
+      </div>
+    </div>`).join('') || '<div class="empty"><div class="empty-ico">💬</div>No grievances match your filter</div>';
+}
+
+function openGrievanceDetail(id) {
+  showToast('Opening grievance ' + id + '…');
+}
+
+async function resolveGrievance(id) {
+  try {
+    await authFetch(`/api/officer/grievances/${id}`, {
+      method:'PATCH', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ status:'resolved' }),
+    });
+  } catch(_) {}
+  const g = SAMPLE_GRIEVANCES.find(x => x.id === id);
+  if (g) g.status = 'resolved';
+  showToast('✅ Grievance resolved and applicant notified.');
+  renderGrievances();
+}
+
+// ── Modals & Panels ────────────────────────────────────────────
+function openNotifPanel() {
+  const ov = document.getElementById('panel-ov');
+  const sp = document.getElementById('side-panel');
+  if (ov) ov.style.display = 'block';
+  if (sp) sp.style.transform = 'translateX(0)';
+}
+
+function closePanel() {
+  const ov = document.getElementById('panel-ov');
+  const sp = document.getElementById('side-panel');
+  if (ov) ov.style.display = 'none';
+  if (sp) sp.style.transform = 'translateX(100%)';
+}
+
+function openFlagModal(appId) {
+  _currentAppId = appId;
+  const modal = document.getElementById('flag-modal');
+  if (modal) modal.classList.add('open');
+}
+
+function closeFlagModal() {
+  const modal = document.getElementById('flag-modal');
+  if (modal) modal.classList.remove('open');
+}
+
+async function submitFlag() {
+  const reason = document.getElementById('flag-reason-select')?.value;
+  const note   = document.getElementById('flag-note')?.value;
+  if (!reason) { alert('Please select a flag reason.'); return; }
+  try {
+    await authFetch(`/api/officer/applications/${_currentAppId}/status`, {
+      method:'PATCH', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ status:'flagged', flag_reason: reason + (note ? ': ' + note : '') }),
+    });
+  } catch(_) {}
+  const app = SAMPLE_APPS.find(a => a.id === _currentAppId);
+  if (app) { app.flagged = true; app.flagReason = reason + (note ? ': ' + note : ''); }
+  closeFlagModal();
+  showToast('🚩 Application flagged. Applicant notified.');
+  renderApps();
+}
+
+function openAssignModal() {
+  const modal = document.getElementById('assign-modal');
+  if (modal) modal.classList.add('open');
+  const dateEl = document.getElementById('insp-date');
+  if (dateEl) {
+    const d = new Date();
+    d.setDate(d.getDate() + 7);
+    dateEl.value = d.toISOString().split('T')[0];
+  }
+}
+
+function closeAssignModal() {
+  const modal = document.getElementById('assign-modal');
+  if (modal) modal.classList.remove('open');
+}
+
+function confirmAssign() {
+  closeAssignModal();
+  showToast('✅ Inspection assigned and officer notified.');
+}
+
+// ── Tabs ───────────────────────────────────────────────────────
+function switchTab(group, tab, btn) {
+  document.querySelectorAll(`#${group === 'queue' ? 'page-myqueue' : group === 'insp' ? 'page-inspections' : 'app-detail-page'} .tab-btn`).forEach(b => b.classList.remove('active'));
+  document.querySelectorAll(`#${group === 'queue' ? 'page-myqueue' : group === 'insp' ? 'page-inspections' : 'app-detail-page'} .tab-pane`).forEach(p => p.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const pane = document.getElementById(`${group === 'appdet' ? 'appdet' : group}-tab-${tab}`);
+  if (pane) pane.classList.add('active');
+}
+
+// ── Charts ─────────────────────────────────────────────────────
+function initCharts() {
+  const chartEl = document.getElementById('dash-chart');
+  if (chartEl) {
+    const data = [42,38,55,61,49,70,65,73,58,80,74,88];
+    const labels = ['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'];
+    const max  = Math.max(...data);
+    chartEl.innerHTML = data.map((v, i) => `
+      <div class="bc-col">
+        <div class="bc-bar" style="height:${(v/max*100)}%;background:${i === 11 ? 'var(--sage)' : 'var(--navyLt)'}"></div>
+        <div class="bc-lbl">${labels[i]}</div>
+      </div>`).join('');
+  }
+
+  const riskEl = document.getElementById('dash-risk');
+  if (riskEl) {
+    const zones = [
+      { name:'Laitumkhrah', val:87, color:'var(--green)' },
+      { name:'Police Bazar', val:72, color:'var(--amber)' },
+      { name:'Mawlai',       val:91, color:'var(--green)' },
+      { name:'Nongthymmai',  val:58, color:'var(--red)'   },
+    ];
+    riskEl.innerHTML = zones.map(z => `
+      <div class="risk-item">
+        <div class="risk-hd"><span>${z.name}</span><span>${z.val}%</span></div>
+        <div class="risk-track"><div class="risk-fill" style="width:${z.val}%;background:${z.color}"></div></div>
+      </div>`).join('');
+  }
+}
+
+// ── Topbar search ──────────────────────────────────────────────
+function handleTopbarSearch(query) {
+  if (!query.trim()) return;
+  navigate('fbo');
+  const searchEl = document.getElementById('fbo-search');
+  if (searchEl) { searchEl.value = query; renderFBO(); }
+}
+
+// ── Toast ──────────────────────────────────────────────────────
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ── Clock ──────────────────────────────────────────────────────
+function startClock() {
+  function tick() {
+    const now = new Date();
+    const el  = document.getElementById('tb-date');
+    if (el) el.textContent = now.toLocaleDateString('en-IN', { weekday:'short', day:'2-digit', month:'short' }) + ' · ' + now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+  }
+  tick();
+  setInterval(tick, 60000);
+}
+
+// ── Expose to window ───────────────────────────────────────────
+Object.assign(window, {
+  officerSendOTP, officerVerifyOTP, officerOtpAdv, officerLogout,
+  navigate, loadOfficerDashboard,
+  renderApps, openAppDetail, closeAppDetail,
+  reviewDocument, getSignedURL, updateAppStatus,
+  openDocRejectDialog, setFilt,
+  renderFBO, openFBOProfile, closeFBOProfile,
+  renderGrievances, openGrievanceDetail, resolveGrievance,
+  openNotifPanel, closePanel,
+  openFlagModal, closeFlagModal, submitFlag,
+  openAssignModal, closeAssignModal, confirmAssign,
+  switchTab, showToast, handleTopbarSearch,
+});
+
+// ── Boot ───────────────────────────────────────────────────────
+(async () => {
+  await initServices();
+
+  // Restore officer session
+  const stored = localStorage.getItem('officer_token');
+  const storedUser = localStorage.getItem('officer_user');
+  if (stored) {
+    officerToken = stored;
+    if (storedUser) { try { updateOfficerProfile(JSON.parse(storedUser)); } catch(_) {} }
+    enterPortal();
+  }
+})();
+</script>
+</body>
+</html>

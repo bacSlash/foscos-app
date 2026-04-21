@@ -1,0 +1,344 @@
+<!-- ═══════════════════════════════════════════════════════
+     TEMP LICENSE FLOW: tl-s1 through tl-s8
+     ═══════════════════════════════════════════════════════ -->
+
+<!-- tl-s1: Eligibility Check -->
+<div class="screen" id="tl-s1">
+  <div class="nav-row">
+    <button class="back-btn" onclick="showScreen('home-screen')">← Back</button>
+    <div class="nav-row-title">Instant Temporary License</div>
+    <button onclick="showScreen('home-screen')" class="back-btn">🏠 Home</button>
+  </div>
+  <div style="max-width:640px;margin:0 auto;padding:32px 24px">
+    <div style="font-size:11px;font-weight:700;color:var(--amber);letter-spacing:1.5px;margin-bottom:8px">⚡ STEP 1 OF 8 — ELIGIBILITY</div>
+    <h2 style="font-size:24px;color:var(--navy);margin-bottom:6px">Let's check your eligibility ⚡</h2>
+    <p style="color:var(--gray);margin-bottom:24px">Answer a few quick questions to see if you qualify.</p>
+    <!-- Q1: Setup type -->
+    <div style="margin-bottom:24px">
+      <div class="field-label" style="margin-bottom:12px">What kind of setup do you have? <span class="req">*</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="tl-setup-grid">
+        <div class="sel-card" onclick="tlSelectSetup('stall',this)"><div class="sel-check">✓</div><div style="font-size:22px;margin-bottom:6px">🛺</div><div style="font-size:14px;font-weight:700;color:var(--navy)">Street Food Stall / Cart</div></div>
+        <div class="sel-card" onclick="tlSelectSetup('home',this)"><div class="sel-check">✓</div><div style="font-size:22px;margin-bottom:6px">🏠</div><div style="font-size:14px;font-weight:700;color:var(--navy)">Home Kitchen</div></div>
+        <div class="sel-card" onclick="tlSelectSetup('event',this)"><div class="sel-check">✓</div><div style="font-size:22px;margin-bottom:6px">🎪</div><div style="font-size:14px;font-weight:700;color:var(--navy)">Pop-up / Event Stall</div></div>
+        <div class="sel-card" onclick="tlSelectSetup('truck',this)"><div class="sel-check">✓</div><div style="font-size:22px;margin-bottom:6px">🚐</div><div style="font-size:14px;font-weight:700;color:var(--navy)">Food Truck</div></div>
+        <div class="sel-card" onclick="tlSelectSetup('dhaba',this)"><div class="sel-check">✓</div><div style="font-size:22px;margin-bottom:6px">🛖</div><div style="font-size:14px;font-weight:700;color:var(--navy)">Dhaba / Small Eatery</div></div>
+        <div class="sel-card" onclick="tlSelectSetup('permanent',this)"><div class="sel-check">✓</div><div style="font-size:22px;margin-bottom:6px">🏗️</div><div style="font-size:14px;font-weight:700;color:var(--navy)">Permanent Business Setup</div></div>
+      </div>
+    </div>
+    <!-- Q2: Turnover (only for permanent) -->
+    <div id="tl-turnover-q" style="display:none;margin-bottom:24px">
+      <div class="field-label" style="margin-bottom:12px">What is your approximate annual turnover? <span class="req">*</span></div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="sel-card" onclick="tlSelectTurnover('under12',this)" style="display:flex;align-items:center;gap:14px"><div class="sel-check">✓</div><span style="font-size:20px">🟢</span><div><div style="font-weight:700;color:var(--green)">Under ₹12 Lakh/year</div><div style="font-size:12px;color:var(--gray)">Eligible for Instant Temporary License</div></div></div>
+        <div class="sel-card" onclick="tlSelectTurnover('12to20',this)" style="display:flex;align-items:center;gap:14px"><div class="sel-check">✓</div><span style="font-size:20px">🟡</span><div><div style="font-weight:700;color:var(--amberDk)">₹12–20 Lakh/year</div><div style="font-size:12px;color:var(--gray)">Needs State License instead</div></div></div>
+        <div class="sel-card" onclick="tlSelectTurnover('above20',this)" style="display:flex;align-items:center;gap:14px"><div class="sel-check">✓</div><span style="font-size:20px">🔴</span><div><div style="font-weight:700;color:var(--red)">Above ₹20 Lakh/year</div><div style="font-size:12px;color:var(--gray)">Needs State/Central License</div></div></div>
+      </div>
+    </div>
+    <!-- Q3: Food items -->
+    <div id="tl-food-q" style="display:none;margin-bottom:24px">
+      <div class="field-label" style="margin-bottom:12px">What food items will you sell? <span class="req">*</span></div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+        <div class="food-card tl-food-ok" onclick="toggleTLFood(this,'snacks')" data-eligible="true"><div class="fc-icon">🫙</div><div class="fc-label">Snacks</div></div>
+        <div class="food-card tl-food-ok" onclick="toggleTLFood(this,'bev')" data-eligible="true"><div class="fc-icon">🧃</div><div class="fc-label">Beverages</div></div>
+        <div class="food-card tl-food-ok" onclick="toggleTLFood(this,'fruits')" data-eligible="true"><div class="fc-icon">🍎</div><div class="fc-label">Fruits/Veg</div></div>
+        <div class="food-card tl-food-ok" onclick="toggleTLFood(this,'meals')" data-eligible="true"><div class="fc-icon">🍱</div><div class="fc-label">Cooked Meals</div></div>
+        <div class="food-card tl-food-ok" onclick="toggleTLFood(this,'sweets')" data-eligible="true"><div class="fc-icon">🍬</div><div class="fc-label">Sweets</div></div>
+        <div class="food-card" onclick="tlHighRisk(this)" data-eligible="false" style="border-color:var(--border)"><div class="fc-icon">🥩</div><div class="fc-label">Raw Meat</div></div>
+        <div class="food-card" onclick="tlHighRisk(this)" data-eligible="false"><div class="fc-icon">🍺</div><div class="fc-label">Alcohol</div></div>
+        <div class="food-card" onclick="tlHighRisk(this)" data-eligible="false"><div class="fc-icon">👶</div><div class="fc-label">Infant Formula</div></div>
+      </div>
+    </div>
+    <!-- Eligibility overlays -->
+    <div id="tl-ineligible" style="display:none">
+      <div class="banner banner-red"><div class="banner-icon">❌</div><div><strong>Not eligible for Instant Temporary License.</strong><br><span style="font-size:13px">Your selection requires a Permanent License. We'll help you apply for the right one.</span><div style="margin-top:10px"><button class="btn-primary btn-sm" onclick="startFBOFlow()">Apply for Correct License →</button></div></div></div>
+    </div>
+    <div id="tl-eligible" style="display:none">
+      <div class="banner banner-sage"><div class="banner-icon">✅</div><div><strong>You're eligible!</strong><br><span style="font-size:13px">Great news — you qualify for an Instant Temporary License. Let's proceed!</span></div></div>
+    </div>
+    <button class="btn-primary" style="width:100%;margin-top:20px" onclick="tlCheckEligibility()">Check Eligibility →</button>
+  </div>
+</div>
+
+<!-- tl-purpose: Purpose -->
+<div class="screen" id="tl-purpose">
+  <div class="nav-row">
+    <button class="back-btn" onclick="tlGo(1)">← Back</button>
+    <div class="nav-row-title">License Purpose</div>
+    <button onclick="showScreen('home-screen')" class="back-btn">🏠 Home</button>
+  </div>
+  <div style="max-width:600px;margin:0 auto;padding:32px 24px">
+    <div style="font-size:11px;font-weight:700;color:var(--amber);letter-spacing:1.5px;margin-bottom:8px">⚡ STEP 1B — PURPOSE</div>
+    <h2 style="font-size:24px;color:var(--navy);margin-bottom:6px">What is this license for? 📋</h2>
+    <p style="color:var(--gray);margin-bottom:24px">This determines your license validity period.</p>
+    <div class="sel-cards-row sel-cards-2">
+      <div class="sel-card" onclick="tlSelectPurpose('stall',this)">
+        <div class="sel-check">✓</div>
+        <div style="font-size:28px;margin-bottom:10px">🛖</div>
+        <h3 style="font-size:16px;color:var(--navy);margin-bottom:8px">Stall / Event</h3>
+        <p style="font-size:13px;color:var(--gray);margin-bottom:12px">Setting up a stall for festival, event, or one-time occasion.</p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span class="badge badge-active">30-day license</span>
+          <span class="badge badge-navy">No conversion needed</span>
+        </div>
+      </div>
+      <div class="sel-card" onclick="tlSelectPurpose('business',this)">
+        <div class="sel-check">✓</div>
+        <div style="font-size:28px;margin-bottom:10px">🏗️</div>
+        <h3 style="font-size:16px;color:var(--navy);margin-bottom:8px">Business Setup</h3>
+        <p style="font-size:13px;color:var(--gray);margin-bottom:12px">Starting a permanent food business, using temp license while applying.</p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span class="badge badge-pending">60-day license</span>
+          <span class="badge badge-navy">Must convert to permanent</span>
+        </div>
+      </div>
+    </div>
+    <button class="btn-primary" style="width:100%;margin-top:20px" id="tl-purpose-btn" onclick="tlGo(2)" disabled>Continue →</button>
+  </div>
+</div>
+
+<!-- tl-s2: Account Creation (OTP) -->
+<div class="screen" id="tl-s2">
+  <div class="nav-row">
+    <button class="back-btn" onclick="tlGo(1)">← Back</button>
+    <div class="nav-row-title">Create Account</div>
+    <button onclick="showScreen('home-screen')" class="back-btn">🏠 Home</button>
+  </div>
+  <div class="center-wrap">
+    <div class="card" style="padding:32px;text-align:center">
+      <div style="font-size:11px;font-weight:700;color:var(--amber);letter-spacing:1.5px;margin-bottom:12px">📱 STEP 2 OF 8 — CREATE ACCOUNT</div>
+      <div style="font-size:36px;margin-bottom:12px">📱</div>
+      <h2 style="font-size:22px;color:var(--navy);margin-bottom:8px">Verify your mobile</h2>
+      <p style="color:var(--gray);font-size:14px;margin-bottom:24px">We'll create your account and send the license to this number.</p>
+      <div id="tl-mobile-step" style="text-align:left">
+        <div class="form-row">
+          <label class="field-label">Mobile Number <span class="req">*</span></label>
+          <div style="display:flex;gap:8px">
+            <div style="padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;color:var(--gray);white-space:nowrap">+91</div>
+            <input class="field-input" type="tel" id="tl-mobile" maxlength="10" placeholder="10-digit mobile"/>
+          </div>
+        </div>
+        <button class="btn-primary" style="width:100%" onclick="sendTLOTP()">Send OTP →</button>
+      </div>
+      <div id="tl-otp-step" style="display:none">
+        <p style="font-size:13px;color:var(--gray);margin-bottom:16px">Enter the 6-digit code sent to +91 <span id="tl-otp-mobile-display"></span></p>
+        <div class="otp-row" id="tl-otp-row"></div>
+        <button class="btn-primary" style="width:100%;margin-top:8px" onclick="verifyTLOTP()">Verify &amp; Continue →</button>
+        <p style="margin-top:12px;font-size:13px;color:var(--gray)"><a href="#" onclick="sendTLOTP();return false" style="color:var(--navy);font-weight:600">Resend OTP</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- tl-s3: Personal Details -->
+<div class="screen" id="tl-s3">
+  <div class="nav-row">
+    <button class="back-btn" onclick="tlGo(2)">← Back</button>
+    <div class="nav-row-title">Your Details</div>
+    <button onclick="showScreen('home-screen')" class="back-btn">🏠 Home</button>
+  </div>
+  <div class="center-wrap">
+    <div class="card" style="padding:32px">
+      <div style="font-size:11px;font-weight:700;color:var(--amber);letter-spacing:1.5px;margin-bottom:12px">📍 STEP 3 OF 8 — YOUR DETAILS</div>
+      <h2 style="font-size:20px;color:var(--navy);margin-bottom:20px">Tell us about yourself 📍</h2>
+      <div class="form-row"><label class="field-label">Full Name <span class="req">*</span></label><input class="field-input" type="text" id="tl-name" placeholder="Your full legal name" oninput="TLData.name=this.value"/></div>
+      <div class="form-row"><label class="field-label">Mobile Number <span class="req">*</span></label><input class="field-input" type="tel" id="tl-mobile-prefill" placeholder="Pre-filled from OTP" readonly/></div>
+      <div class="form-row">
+        <label class="field-label">Pincode <span class="req">*</span></label>
+        <input class="field-input" type="tel" id="tl-pincode" maxlength="6" placeholder="6-digit pincode" oninput="onTLPincodeInput(this)"/>
+        <div id="tl-area-display" style="font-size:12px;color:var(--sage);margin-top:4px"></div>
+      </div>
+      <div class="form-row"><label class="field-label">Business Name <span class="req">*</span></label><input class="field-input" type="text" id="tl-bizname" placeholder="Your stall or business name" oninput="TLData.bizName=this.value"/></div>
+      <div class="form-row">
+        <label class="field-label">Setup Type</label>
+        <div class="read-only-chip" id="tl-setup-chip">🛺 Street Food Stall</div>
+      </div>
+      <button class="btn-primary" style="width:100%;margin-top:8px" onclick="tlValidateAndGo(4)">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- tl-s4: Geotagged Photos -->
+<div class="screen" id="tl-s4">
+  <div class="nav-row">
+    <button class="back-btn" onclick="tlGo(3)">← Back</button>
+    <div class="nav-row-title">Location Photos</div>
+    <button onclick="showScreen('home-screen')" class="back-btn">🏠 Home</button>
+  </div>
+  <div class="center-wrap">
+    <div class="card" style="padding:28px">
+      <div style="font-size:11px;font-weight:700;color:var(--amber);letter-spacing:1.5px;margin-bottom:12px">📸 STEP 4 OF 8 — LOCATION</div>
+      <h2 style="font-size:20px;color:var(--navy);margin-bottom:6px">Geotagged Photos 📸</h2>
+      <div class="banner banner-amber" style="margin-bottom:20px"><div class="banner-icon">📍</div><div style="font-size:13px"><strong>GPS must be ON</strong> — Photos must be taken with location services enabled for verification.</div></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:13px;color:var(--gray)">Photos uploaded: <strong id="tl-photo-count">0</strong> / 2</span>
+      </div>
+      <div class="upload-progress-bar" style="margin-bottom:16px"><div class="upload-progress-fill" id="tl-photo-progress" style="width:0%"></div></div>
+      <!-- Photo 1 -->
+      <div style="margin-bottom:16px">
+        <div class="field-label" style="margin-bottom:8px">📸 Setup / Stall Photo <span class="req">*</span></div>
+        <div class="photo-upload-box" id="tl-photo1-box" onclick="document.getElementById('tl-photo1-input').click()">
+          <div id="tl-photo1-icon" style="font-size:28px;margin-bottom:6px">📸</div>
+          <div style="font-size:13px;color:var(--gray)" id="tl-photo1-label">Tap to take/upload photo of your stall</div>
+          <input type="file" id="tl-photo1-input" accept="image/*" capture="environment" style="display:none" onchange="tlUploadPhoto(1,this)"/>
+        </div>
+      </div>
+      <!-- Photo 2 -->
+      <div style="margin-bottom:20px">
+        <div class="field-label" style="margin-bottom:8px">🔧 Equipment / Cooking Area Photo <span class="req">*</span></div>
+        <div class="photo-upload-box" id="tl-photo2-box" onclick="document.getElementById('tl-photo2-input').click()">
+          <div id="tl-photo2-icon" style="font-size:28px;margin-bottom:6px">🔧</div>
+          <div style="font-size:13px;color:var(--gray)" id="tl-photo2-label">Tap to take/upload equipment photo</div>
+          <input type="file" id="tl-photo2-input" accept="image/*" capture="environment" style="display:none" onchange="tlUploadPhoto(2,this)"/>
+        </div>
+      </div>
+      <button class="btn-primary" style="width:100%" onclick="tlGo(5)" id="tl-photo-continue-btn">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- tl-s5: KYC Documents -->
+<div class="screen" id="tl-s5">
+  <div class="nav-row">
+    <button class="back-btn" onclick="tlGo(4)">← Back</button>
+    <div class="nav-row-title">KYC Documents</div>
+    <button onclick="showScreen('home-screen')" class="back-btn">🏠 Home</button>
+  </div>
+  <div class="center-wrap">
+    <div class="card" style="padding:28px">
+      <div style="font-size:11px;font-weight:700;color:var(--amber);letter-spacing:1.5px;margin-bottom:12px">📄 STEP 5 OF 8 — KYC</div>
+      <h2 style="font-size:20px;color:var(--navy);margin-bottom:6px">KYC Documents 📄</h2>
+      <div class="banner banner-amber" style="margin-bottom:16px"><div class="banner-icon">🥔</div><div style="font-size:13px">Aadhaar + cart purchase bill is all you need.</div></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:13px;color:var(--gray)">Uploaded: <strong id="tl-doc-count">0</strong> / 2</span>
+      </div>
+      <div class="upload-progress-bar" style="margin-bottom:16px"><div class="upload-progress-fill" id="tl-doc-progress" style="width:0%"></div></div>
+      <!-- KYC Doc 1 -->
+      <div class="doc-row" style="margin-bottom:10px">
+        <div class="doc-row-head" onclick="toggleDocRow(this)">
+          <div class="doc-num" id="tl-doc1-num">1</div>
+          <div class="doc-info"><div class="doc-title">🪪 Photo Identity Proof</div><div class="doc-sub">Aadhaar / PAN / Voter ID / DL / Passport</div></div>
+          <div class="doc-row-actions">
+            <span class="doc-status-badge status-pending" id="tl-doc1-badge">Pending</span>
+            <button class="btn-sage btn-sm" onclick="event.stopPropagation();document.getElementById('tl-kyc1-input').click()">Upload</button>
+            <input type="file" id="tl-kyc1-input" accept="image/*,.pdf" style="display:none" onchange="tlUploadDoc(1,this)"/>
+          </div>
+          <span>▾</span>
+        </div>
+        <div class="doc-row-body"><p style="font-size:13px;color:var(--gray)">Accepted: Aadhaar Card, PAN Card, Voter ID, Driving License, or Passport. Must be clearly readable.</p></div>
+      </div>
+      <!-- KYC Doc 2 -->
+      <div class="doc-row" style="margin-bottom:20px">
+        <div class="doc-row-head" onclick="toggleDocRow(this)">
+          <div class="doc-num" id="tl-doc2-num">2</div>
+          <div class="doc-info"><div class="doc-title">🏪 Proof of Establishment</div><div class="doc-sub">Cart purchase bill / Rent agreement / Electricity bill</div></div>
+          <div class="doc-row-actions">
+            <span class="doc-status-badge status-pending" id="tl-doc2-badge">Pending</span>
+            <button class="btn-sage btn-sm" onclick="event.stopPropagation();document.getElementById('tl-kyc2-input').click()">Upload</button>
+            <input type="file" id="tl-kyc2-input" accept="image/*,.pdf" style="display:none" onchange="tlUploadDoc(2,this)"/>
+          </div>
+          <span>▾</span>
+        </div>
+        <div class="doc-row-body"><p style="font-size:13px;color:var(--gray)">Accepted: Cart purchase bill, rent agreement, electricity bill, or any government document showing your establishment.</p></div>
+      </div>
+      <button class="btn-primary" style="width:100%" onclick="tlGo(6)">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- tl-s6: Disclaimer + Payment -->
+<div class="screen" id="tl-s6">
+  <div class="nav-row">
+    <button class="back-btn" onclick="tlGo(5)">← Back</button>
+    <div class="nav-row-title">Rules &amp; Payment</div>
+    <button onclick="showScreen('home-screen')" class="back-btn">🏠 Home</button>
+  </div>
+  <div class="center-wrap">
+    <div class="card" style="padding:28px;margin-bottom:16px">
+      <div style="font-size:11px;font-weight:700;color:var(--amber);letter-spacing:1.5px;margin-bottom:12px">📋 STEP 6 OF 8 — RULES &amp; AGREEMENT</div>
+      <h2 style="font-size:20px;color:var(--navy);margin-bottom:16px">Terms &amp; Conditions 📋</h2>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+        <label style="display:flex;align-items:flex-start;gap:12px;font-size:14px;cursor:pointer"><input type="checkbox" id="tl-tc1" style="margin-top:2px;accent-color:var(--amber)"/><span>I confirm the food items listed are accurate and I will only sell the declared items.</span></label>
+        <label style="display:flex;align-items:flex-start;gap:12px;font-size:14px;cursor:pointer"><input type="checkbox" id="tl-tc2" style="margin-top:2px;accent-color:var(--amber)"/><span>I understand this license does not permit sale of restricted items (raw meat, alcohol, infant formula, export goods).</span></label>
+        <label style="display:flex;align-items:flex-start;gap:12px;font-size:14px;cursor:pointer"><input type="checkbox" id="tl-tc3" style="margin-top:2px;accent-color:var(--amber)"/><span>I agree to comply with all FSSAI food safety standards and allow inspection at any time.</span></label>
+      </div>
+      <!-- Eligible / Restricted food rules -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:var(--greenLt);border-radius:10px;padding:12px">
+          <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px">✅ ALLOWED</div>
+          <div style="font-size:12px;color:var(--charcoal);line-height:1.8">Snacks · Beverages · Cooked meals · Fruits &amp; veg · Sweets &amp; mithai · Packaged goods · Dairy products</div>
+        </div>
+        <div style="background:var(--redLt);border-radius:10px;padding:12px">
+          <div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:6px">❌ RESTRICTED</div>
+          <div style="font-size:12px;color:var(--charcoal);line-height:1.8">Raw meat · Alcohol · Infant formula · Export items · Unlabelled packaged goods</div>
+        </div>
+      </div>
+    </div>
+    <!-- Payment -->
+    <div class="card" style="padding:28px">
+      <h3 style="font-size:16px;color:var(--navy);margin-bottom:14px">💰 Payment</h3>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding:14px;background:var(--greenLt);border-radius:10px">
+        <span style="font-size:15px;font-weight:700;color:var(--navy)">Total Fee</span>
+        <span style="font-size:24px;font-weight:700;color:var(--green)">₹0 <span style="font-size:13px;font-weight:400;color:var(--gray)">(Free for Instant TL)</span></span>
+      </div>
+      <button class="btn-primary" style="width:100%" onclick="tlProceedAfterDisclaimer()">🔒 Accept &amp; Get License →</button>
+    </div>
+  </div>
+</div>
+
+<!-- tl-s7: License Issued -->
+<div class="screen" id="tl-s7">
+  <div class="nav-row">
+    <button class="back-btn" onclick="tlGo(6)">← Back</button>
+    <div class="nav-row-title">License Issued!</div>
+    <button onclick="showScreen('home-screen')" class="back-btn">🏠 Home</button>
+  </div>
+  <div class="center-wrap">
+    <div style="font-size:11px;font-weight:700;color:var(--amber);letter-spacing:1.5px;margin:24px 0 8px;text-align:center">🎉 STEP 7 OF 8 — LICENSE</div>
+    <div class="tl-card-issued">
+      <div style="font-size:11px;font-weight:700;letter-spacing:2px;opacity:.7;margin-bottom:10px">⚡ INSTANT TEMPORARY LICENSE — ISSUED</div>
+      <div style="font-size:22px;font-weight:700;margin-bottom:4px" id="tl7-bizname">My Business</div>
+      <div class="license-number" style="color:rgba(255,255,255,.7);margin-bottom:10px;font-size:13px" id="tl7-licnum">TL-2026-00001</div>
+      <div style="font-size:13px;opacity:.7;margin-bottom:4px">Valid Until</div>
+      <div style="font-size:20px;font-weight:700" id="tl7-expiry">—</div>
+      <div style="margin-top:16px">
+        <div style="font-size:12px;opacity:.7;margin-bottom:4px">Days Remaining</div>
+        <div class="countdown-display" id="tl7-countdown">—</div>
+      </div>
+      <div style="margin-top:12px;opacity:.6;font-size:12px">🏛️ FSSAI — Government of India</div>
+    </div>
+    <!-- Stall note -->
+    <div id="tl-stall-note" style="display:none">
+      <div class="banner banner-sage"><div class="banner-icon">✅</div><div style="font-size:13px"><strong>30-day stall license.</strong> No conversion required. Enjoy your event!</div></div>
+    </div>
+    <!-- Business note -->
+    <div id="tl-convert-note" style="display:none">
+      <div class="banner banner-amber"><div class="banner-icon">⚠️</div><div style="font-size:13px"><strong>60-day compliance window.</strong> You must apply for a Permanent License before expiry or cease operations.</div></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn-primary" style="flex:1" onclick="alert('PDF download coming soon')">📥 Download License PDF</button>
+      <button class="btn-ghost" style="flex:1" onclick="alert('WhatsApp share coming soon')">💬 Share</button>
+    </div>
+    <button class="btn-sage" style="width:100%;margin-top:10px" onclick="tlGo(8)">Continue → FoSTaC Training</button>
+  </div>
+</div>
+
+<!-- tl-s8: FoSTaC Training -->
+<div class="screen" id="tl-s8">
+  <div class="nav-row">
+    <button class="back-btn" onclick="tlGo(7)">← Back</button>
+    <div class="nav-row-title">FoSTaC Training</div>
+    <button onclick="showScreen('home-screen')" class="back-btn">🏠 Home</button>
+  </div>
+  <div class="center-wrap">
+    <div class="card" style="padding:32px;text-align:center">
+      <div style="font-size:11px;font-weight:700;color:var(--amber);letter-spacing:1.5px;margin-bottom:12px">🎓 STEP 8 OF 8 — FoSTaC</div>
+      <div style="font-size:48px;margin-bottom:12px">🎓</div>
+      <h2 style="font-size:22px;color:var(--navy);margin-bottom:8px">FoSTaC Food Safety Training</h2>
+      <p style="font-size:14px;color:var(--gray);margin-bottom:20px">Mandatory training for all FSSAI license holders. Covers food safety principles, hygiene, and compliance.</p>
+      <div class="banner banner-amber" style="text-align:left;margin-bottom:20px"><div class="banner-icon">⚠️</div><div style="font-size:13px">Training must be completed within <strong>90 days</strong> of license issuance.</div></div>
+      <button class="btn-primary" style="width:100%;margin-bottom:10px" id="tl8-enrol-btn" onclick="tlEnrollFostac()">Enrol in FoSTaC →</button>
+      <div id="tl8-enrolled-msg" style="display:none;font-size:13px;color:var(--green);font-weight:700;margin-bottom:16px">✅ Enrolled! Training details sent to your mobile.</div>
+      <button class="btn-ghost" style="width:100%" onclick="tlFinish()">Go to Dashboard →</button>
+    </div>
+  </div>
+</div>
