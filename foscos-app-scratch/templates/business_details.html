@@ -1,0 +1,135 @@
+{% extends "_base.html" %}
+
+{% block title %}Business Details — FOSCOS{% endblock %}
+{% block extra_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/registration.css') }}" />
+{% endblock %}
+
+{% block content %}
+<div class="reg-page">
+
+  <!-- ── Progress stepper ── -->
+  <div class="reg-stepper">
+    <div class="reg-stepper__inner">
+      <div class="reg-stepper__step">Profile</div>
+      <div class="reg-stepper__step active">Details</div>
+      <div class="reg-stepper__step">Documents</div>
+      <div class="reg-stepper__step">Review</div>
+    </div>
+  </div>
+
+  <!-- ── Top nav ── -->
+  <div class="reg-topnav">
+    <a href="/scale" class="reg-back-btn">← Back</a>
+    <a href="/" class="reg-home-btn">🏠 Home</a>
+  </div>
+
+  <!-- ── Content ── -->
+  <div class="reg-content reg-fade-in">
+    <h1 class="reg-title">Tell us about your premises 🏪</h1>
+    <p class="reg-sub">We need a few details about where you operate from. All fields can be edited manually.</p>
+
+    <!-- BUSINESS INFO -->
+    <div class="reg-form-card" style="margin-bottom:20px;">
+      <p class="reg-section-label">Business Information</p>
+
+      <label class="reg-field-label" for="bizName">Business / Trade Name</label>
+      <input class="reg-input" type="text" id="bizName" placeholder="e.g. Sharma's Dhaba" autocomplete="organization" />
+
+      <label class="reg-field-label" for="ownerName">Owner / Proprietor Name</label>
+      <input class="reg-input" type="text" id="ownerName" placeholder="Full legal name" autocomplete="name" />
+
+      <label class="reg-field-label" for="bizPhone">Business Contact Number</label>
+      <div class="reg-number-wrap">
+        <div class="reg-number-wrap__prefix">+91</div>
+        <input type="tel" id="bizPhone" placeholder="10-digit number" maxlength="10" inputmode="numeric" />
+      </div>
+
+      <label class="reg-field-label" for="bizEmail">Email Address (optional)</label>
+      <input class="reg-input" type="email" id="bizEmail" placeholder="For license notifications" autocomplete="email" />
+    </div>
+
+    <!-- PREMISES ADDRESS -->
+    <div class="reg-form-card" style="margin-bottom:20px;">
+      <p class="reg-section-label">Premises Address</p>
+
+      <label class="reg-field-label" for="addrLine1">Street Address / Plot No.</label>
+      <input class="reg-input" type="text" id="addrLine1" placeholder="Shop no., building, street" autocomplete="address-line1" />
+
+      <label class="reg-field-label" for="addrLine2">Area / Locality (optional)</label>
+      <input class="reg-input" type="text" id="addrLine2" placeholder="Colony, sector, landmark" autocomplete="address-line2" />
+
+      <div class="reg-addr-row" style="margin-top:0;">
+        <div>
+          <label class="reg-field-label" for="addrPincode">Pincode</label>
+          <input class="reg-input" type="text" id="addrPincode" placeholder="6-digit pincode" maxlength="6" inputmode="numeric" />
+        </div>
+        <div>
+          <label class="reg-field-label" for="addrCity">City / Town</label>
+          <input class="reg-input" type="text" id="addrCity" placeholder="Auto-filled or enter manually" />
+        </div>
+      </div>
+
+      <div class="reg-addr-row">
+        <div>
+          <label class="reg-field-label" for="addrDistrict">District</label>
+          <select class="reg-input" id="addrDistrict">
+            <option value="">Select district</option>
+          </select>
+        </div>
+        <div>
+          <label class="reg-field-label" for="addrState">State / UT</label>
+          <input class="reg-input" type="text" id="addrState" placeholder="Auto-filled or enter manually" />
+        </div>
+      </div>
+    </div>
+
+    <!-- PREMISES PHOTO -->
+    <div class="reg-form-card" style="margin-bottom:20px;">
+      <p class="reg-section-label">Premises Photo</p>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Upload a photo of your premises. If the image has GPS data, your location will be auto-detected.</p>
+
+      <div class="reg-photo-upload" id="photoUploadArea">
+        <input type="file" id="premisesPhoto" accept="image/*" capture="environment" />
+        <div id="photoPlaceholder">
+          <div class="reg-photo-upload__icon">📷</div>
+          <div class="reg-photo-upload__text">Tap to upload or take a photo</div>
+          <div class="reg-photo-upload__sub">JPG, PNG — max 5 MB</div>
+        </div>
+        <div id="photoPreviewArea" style="display:none;">
+          <img class="reg-photo-preview" id="photoPreviewImg" src="" alt="Premises photo" />
+          <div class="reg-photo-upload__text" id="photoFileName"></div>
+        </div>
+      </div>
+
+      <div id="gpsTag" class="reg-gps-tag" style="display:none;">
+        <span>📍</span>
+        <span id="gpsText">Location detected</span>
+      </div>
+    </div>
+
+    <!-- TAX INFORMATION (shown only for state/central license) -->
+    <div class="reg-form-card" id="taxSection" style="display:none;margin-bottom:20px;">
+      <p class="reg-section-label">Tax Information</p>
+
+      <label class="reg-field-label" for="panNumber">PAN Card Number</label>
+      <input class="reg-input" type="text" id="panNumber" placeholder="ABCDE1234F" maxlength="10"
+             style="text-transform:uppercase;" autocomplete="off" />
+      <p style="font-size:12px;color:var(--text-muted);margin-top:4px;">Required for State / Central license applicants</p>
+
+      <label class="reg-field-label" for="gstNumber">GSTIN (optional)</label>
+      <input class="reg-input" type="text" id="gstNumber" placeholder="22ABCDE1234F1Z5" maxlength="15"
+             style="text-transform:uppercase;" autocomplete="off" />
+    </div>
+
+    <p class="reg-error" id="detailsError"></p>
+    <button class="reg-btn-cta" id="detailsContinueBtn">Looks good, continue →</button>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/exifr/dist/lite.umd.js"></script>
+<script src="{{ url_for('static', filename='js/business_details.js') }}"></script>
+{% endblock %}

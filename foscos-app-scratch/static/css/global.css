@@ -1,0 +1,210 @@
+/* ============================================================
+   GLOBAL CSS — Variables · Reset · Navbar · Modal · Chatbot · Footer
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap');
+
+/* ── Design tokens ──────────────────────────────────────────── */
+:root {
+  --navy:           #1c2b4a;
+  --navy-dark:      #141e36;
+  --amber:          #c8813a;
+  --amber-hover:    #b3712f;
+  --cream:          #faf7ed;
+  --cream-2:        #f0eada;
+  --white:          #ffffff;
+  --text-primary:   #1c2b4a;
+  --text-muted:     #64748b;
+  --card-green:     #edf2e8;
+  --card-green-bd:  #c8d8bc;
+
+  --font-display:   'Playfair Display', Georgia, serif;
+  --font-body:      'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --nav-h:          72px;
+
+  --shadow-sm:  0 1px 4px rgba(0,0,0,0.07);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.10);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,0.14);
+
+  --r:    10px;
+  --r-lg: 16px;
+  --r-xl: 20px;
+}
+
+/* ── Reset ──────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-body); color: var(--text-primary); background: var(--cream); line-height: 1.6; min-height: 100vh; }
+a { text-decoration: none; color: inherit; }
+button { font-family: var(--font-body); cursor: pointer; }
+
+/* ── NAVBAR ─────────────────────────────────────────────────── */
+.navbar {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  background: var(--navy);
+  display: flex; align-items: center;
+  padding: 0 40px;
+  z-index: 100;
+}
+
+.navbar__logo {
+  display: flex; align-items: center;
+  margin-right: 44px; flex-shrink: 0;
+}
+
+.navbar__logo-img {
+  height: 44px; width: auto;
+  background: white; padding: 4px 10px;
+  border-radius: 8px;
+  display: block;
+}
+
+.navbar__links {
+  display: flex; align-items: center; gap: 30px; flex: 1;
+}
+.navbar__links a {
+  color: rgba(255,255,255,0.78); font-size: 14.5px; font-weight: 500;
+  padding: 4px 0; border-bottom: 2px solid transparent;
+  transition: color .2s, border-color .2s;
+}
+.navbar__links a:hover, .navbar__links a.active {
+  color: #fff; border-bottom-color: var(--amber);
+}
+
+.navbar__actions { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+
+.btn-lang {
+  display: flex; align-items: center; gap: 7px;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18);
+  color: white; padding: 8px 14px; border-radius: var(--r);
+  font-size: 13px; font-weight: 500; transition: background .2s;
+}
+.btn-lang:hover { background: rgba(255,255,255,0.14); }
+
+.btn-login {
+  background: var(--amber); color: white; border: none;
+  padding: 10px 22px; border-radius: var(--r);
+  font-size: 14px; font-weight: 600;
+  transition: background .2s, transform .15s;
+}
+.btn-login:hover { background: var(--amber-hover); transform: translateY(-1px); }
+
+/* ── LOGIN MODAL ─────────────────────────────────────────────── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
+  z-index: 200; align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--white); border-radius: var(--r-xl);
+  padding: 40px; width: 100%; max-width: 420px;
+  position: relative; box-shadow: var(--shadow-lg);
+  animation: fade-up .22s ease;
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(-14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.modal__close {
+  position: absolute; top: 14px; right: 14px;
+  width: 30px; height: 30px; border-radius: 50%;
+  border: none; background: var(--cream); font-size: 16px;
+  color: var(--text-muted); display: flex; align-items: center; justify-content: center;
+  transition: background .2s;
+}
+.modal__close:hover { background: var(--cream-2); }
+
+.modal__wordmark {
+  font-family: var(--font-display); font-size: 19px; font-weight: 700;
+  color: #e07830; margin-bottom: 8px;
+}
+.modal h2 {
+  font-family: var(--font-display); font-size: 22px;
+  color: var(--text-primary); margin-bottom: 4px;
+}
+.modal .modal-sub { color: var(--text-muted); font-size: 13.5px; margin-bottom: 28px; }
+
+.modal__body {
+  background: var(--cream); border: 2px dashed var(--cream-2);
+  border-radius: var(--r); padding: 32px; text-align: center;
+}
+.modal__body p { color: var(--text-muted); font-size: 13.5px; }
+.modal__body .tag {
+  display: inline-block; margin-top: 10px;
+  color: var(--amber); font-size: 11px; font-weight: 700;
+  letter-spacing: 0.8px; text-transform: uppercase;
+}
+
+/* ── CHATBOT FAB + PANEL ─────────────────────────────────────── */
+.chatbot-fab {
+  position: fixed; bottom: 28px; right: 28px;
+  width: 58px; height: 58px; border-radius: 50%;
+  background: #8b5e3c; border: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.32);
+  z-index: 150; font-size: 28px;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .2s, box-shadow .2s;
+}
+.chatbot-fab:hover { transform: scale(1.08); box-shadow: 0 6px 26px rgba(0,0,0,0.38); }
+
+.chatbot-panel {
+  display: none; position: fixed; bottom: 100px; right: 28px;
+  width: 360px; height: 480px;
+  background: var(--white); border-radius: var(--r-xl);
+  box-shadow: var(--shadow-lg); z-index: 150;
+  flex-direction: column; overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.07);
+  animation: fade-up .22s ease;
+}
+.chatbot-panel.open { display: flex; }
+
+.chatbot-panel__header {
+  background: var(--navy); padding: 16px 20px;
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+}
+.chatbot-panel__header .avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: #8b5e3c; font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+}
+.chatbot-panel__header .info { flex: 1; }
+.chatbot-panel__header .name { color: white; font-size: 14px; font-weight: 600; display: block; }
+.chatbot-panel__header .status { color: rgba(255,255,255,0.5); font-size: 11px; }
+.chatbot-panel__close {
+  background: none; border: none; color: rgba(255,255,255,0.6);
+  font-size: 20px; line-height: 1; padding: 2px;
+}
+.chatbot-panel__close:hover { color: white; }
+
+.chatbot-panel__body {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 28px; text-align: center; gap: 10px;
+}
+.chatbot-panel__body .icon { font-size: 44px; }
+.chatbot-panel__body .msg { color: var(--text-muted); font-size: 14px; line-height: 1.5; }
+.chatbot-panel__body .tag {
+  color: var(--amber); font-size: 11px; font-weight: 700;
+  letter-spacing: 0.8px; text-transform: uppercase;
+}
+
+/* ── FOOTER ──────────────────────────────────────────────────── */
+.footer {
+  background: var(--navy-dark); padding: 36px 40px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 24px; flex-wrap: wrap;
+}
+.footer__logo-img {
+  height: 36px; width: auto;
+  background: white; padding: 3px 8px;
+  border-radius: 6px;
+}
+.footer__links { display: flex; align-items: center; gap: 24px; }
+.footer__links a { color: rgba(255,255,255,0.55); font-size: 13px; transition: color .2s; }
+.footer__links a:hover { color: rgba(255,255,255,0.9); }
+.footer__copy { color: rgba(255,255,255,0.4); font-size: 12.5px; }

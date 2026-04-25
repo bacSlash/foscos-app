@@ -1,0 +1,98 @@
+{% extends "_base.html" %}
+
+{% block title %}Payment Confirmed — FOSCOS{% endblock %}
+{% block extra_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/registration.css') }}" />
+{% endblock %}
+
+{% block content %}
+<div class="submitted-page">
+  <div class="submitted-card">
+
+    <!-- Success mark -->
+    <div class="submitted-success-ring">
+      <div class="submitted-check-icon">✓</div>
+    </div>
+
+    <div class="submitted-card__title">Payment Confirmed!</div>
+    <div class="submitted-card__sub">
+      Your FSSAI license application has been received and is now under review.
+    </div>
+
+    <!-- Application ID badge -->
+    <div class="submitted-app-id" id="submittedAppId">—</div>
+
+    <!-- Receipt table -->
+    <div class="submitted-receipt">
+      <div class="submitted-receipt__header">Payment Receipt</div>
+
+      <div class="submitted-receipt__section">
+        <div class="submitted-receipt__label">License Details</div>
+        <div class="submitted-detail-row">
+          <span>Business Name</span>
+          <span id="sub-bizName">—</span>
+        </div>
+        <div class="submitted-detail-row">
+          <span>License Type</span>
+          <span id="sub-licenseType">—</span>
+        </div>
+        <div class="submitted-detail-row">
+          <span>Duration</span>
+          <span id="sub-duration">—</span>
+        </div>
+        <div class="submitted-detail-row">
+          <span>License Fee</span>
+          <span id="sub-fee">—</span>
+        </div>
+      </div>
+
+      <div class="submitted-receipt__section" id="sub-ossSection" style="display:none;">
+        <div class="submitted-receipt__label">One Stop Shop Add-ons</div>
+        <div id="sub-ossRows"></div>
+      </div>
+
+      <div class="submitted-detail-row submitted-detail-row--total">
+        <span>Total Paid</span>
+        <span id="sub-total">—</span>
+      </div>
+    </div>
+
+    <!-- What happens next -->
+    <div class="submitted-next">
+      <div class="submitted-next__title">What happens next</div>
+      <div class="submitted-next__steps">
+        <div class="submitted-next__step done">
+          <div class="dot"></div>
+          <span>Application submitted &amp; payment confirmed</span>
+        </div>
+        <div class="submitted-next__step">
+          <div class="dot"></div>
+          <span>FSSAI officials review your documents <em>(~30 working days)</em></span>
+        </div>
+        <div class="submitted-next__step">
+          <div class="dot"></div>
+          <span>Inspection scheduled if required</span>
+        </div>
+        <div class="submitted-next__step">
+          <div class="dot"></div>
+          <span>License issued — you'll receive an SMS &amp; email</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:28px;display:flex;flex-direction:column;gap:10px;">
+      <a href="/fbo-portal" class="reg-btn-cta" style="display:block;text-align:center;text-decoration:none;">
+        Track My Application →
+      </a>
+      <a href="/" style="font-size:13.5px;color:var(--text-muted);display:block;text-align:center;">
+        Back to Home
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/application_submitted.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,281 @@
+/* ============================================================
+   FBO PORTAL CSS — P23 Dashboard
+   ============================================================ */
+
+.fbo-page {
+  min-height: 100vh;
+  background: var(--cream);
+  padding-top: var(--nav-h);
+}
+
+/* ── Header strip ─────────────────────────────────────────────── */
+.fbo-header {
+  background: var(--navy);
+  padding: 32px 40px;
+}
+
+.fbo-header__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.fbo-header__greeting {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 4px;
+}
+
+.fbo-header__sub {
+  font-size: 13px;
+  color: rgba(255,255,255,.6);
+}
+
+.fbo-header__license-chip {
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 8px;
+  padding: 8px 16px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.fbo-header__license-chip .label {
+  font-size: 11px;
+  color: rgba(255,255,255,.6);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.fbo-header__license-chip .value {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--white);
+  font-family: monospace;
+  letter-spacing: .06em;
+}
+
+/* ── Content area ─────────────────────────────────────────────── */
+.fbo-content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 36px 40px 80px;
+}
+
+/* ── Status banner (pending state) ──────────────────────────── */
+.fbo-status-banner {
+  background: #fff8ee;
+  border: 1.5px solid #f0c87a;
+  border-radius: 16px;
+  padding: 28px 28px;
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.fbo-status-banner__icon { font-size: 36px; flex-shrink: 0; }
+
+.fbo-status-banner__body { flex: 1; }
+
+.fbo-status-banner__title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 6px;
+}
+
+.fbo-status-banner__sub {
+  font-size: 13.5px;
+  color: #5c3d0a;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.fbo-status-banner__id {
+  display: inline-block;
+  background: #f5f3ee;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--navy);
+  font-family: monospace;
+  letter-spacing: .07em;
+  margin-bottom: 16px;
+}
+
+/* ── Timeline steps ───────────────────────────────────────────── */
+.fbo-timeline {
+  display: flex;
+  gap: 0;
+  margin-bottom: 24px;
+  border: 1.5px solid #e8e5dc;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.fbo-timeline__step {
+  flex: 1;
+  padding: 14px 12px;
+  text-align: center;
+  font-size: 12px;
+  background: var(--white);
+  border-right: 1px solid #e8e5dc;
+  position: relative;
+}
+
+.fbo-timeline__step:last-child { border-right: none; }
+
+.fbo-timeline__step.done { background: #edfaf0; }
+.fbo-timeline__step.active { background: #fff8ee; }
+
+.fbo-timeline__step .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d4cec4;
+  margin: 0 auto 6px;
+}
+
+.fbo-timeline__step.done .dot { background: #6abf7a; }
+.fbo-timeline__step.active .dot { background: var(--amber); }
+
+.fbo-timeline__step .step-label {
+  font-weight: 600;
+  color: var(--navy);
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+/* ── Grid of portal cards ─────────────────────────────────────── */
+.fbo-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 28px;
+}
+
+.fbo-card {
+  background: var(--white);
+  border: 1.5px solid #e0ddd5;
+  border-radius: 16px;
+  padding: 24px 22px;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.fbo-card:hover {
+  border-color: var(--amber);
+  box-shadow: 0 3px 14px rgba(200,129,58,.1);
+}
+
+.fbo-card__icon { font-size: 28px; margin-bottom: 12px; }
+
+.fbo-card__title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 4px;
+}
+
+.fbo-card__sub { font-size: 12.5px; color: var(--text-muted); line-height: 1.4; }
+
+/* ── License info panel ───────────────────────────────────────── */
+.fbo-license-panel {
+  background: var(--white);
+  border: 1.5px solid #e0ddd5;
+  border-radius: 16px;
+  padding: 24px 24px;
+  margin-bottom: 28px;
+}
+
+.fbo-license-panel__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-top: 16px;
+}
+
+.fbo-license-field__label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.fbo-license-field__value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+/* ── CTA button ───────────────────────────────────────────────── */
+.fbo-btn-primary {
+  background: var(--amber);
+  color: var(--white);
+  border: none;
+  border-radius: 12px;
+  padding: 14px 32px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: background .2s, transform .15s;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.fbo-btn-primary:hover { background: var(--amber-hover); transform: translateY(-1px); }
+
+.fbo-btn-secondary {
+  background: none;
+  color: var(--navy);
+  border: 1.5px solid #d4cec4;
+  border-radius: 12px;
+  padding: 13px 28px;
+  font-size: 14.5px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.fbo-btn-secondary:hover { border-color: var(--amber); background: #fdf8f2; }
+
+/* ── Section heading ───────────────────────────────────────────── */
+.fbo-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+/* ── Responsive ────────────────────────────────────────────────── */
+@media (max-width: 860px) {
+  .fbo-header { padding: 24px 20px; }
+  .fbo-content { padding: 24px 20px 60px; }
+  .fbo-header__inner { flex-direction: column; align-items: flex-start; }
+  .fbo-cards-grid { grid-template-columns: repeat(2, 1fr); }
+  .fbo-license-panel__grid { grid-template-columns: repeat(2, 1fr); }
+  .fbo-timeline { flex-direction: column; }
+  .fbo-timeline__step { border-right: none; border-bottom: 1px solid #e8e5dc; }
+  .fbo-timeline__step:last-child { border-bottom: none; }
+}
+
+@media (max-width: 560px) {
+  .fbo-cards-grid { grid-template-columns: 1fr; }
+  .fbo-license-panel__grid { grid-template-columns: 1fr 1fr; }
+}

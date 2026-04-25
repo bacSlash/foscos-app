@@ -1,0 +1,201 @@
+{% extends "_base.html" %}
+
+{% block title %}FBO Portal — FOSCOS{% endblock %}
+{% block extra_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/fbo_portal.css') }}" />
+{% endblock %}
+
+{% block content %}
+<div class="fbo-page">
+
+  <!-- ── Pending state ── -->
+  <div id="fboPendingView" style="display:none;">
+
+    <div class="fbo-header">
+      <div class="fbo-header__inner">
+        <div>
+          <div class="fbo-header__greeting" id="pendingGreeting">Application Under Review</div>
+          <div class="fbo-header__sub">We're processing your application. You'll hear from us soon.</div>
+        </div>
+        <div class="fbo-header__license-chip">
+          <span class="label">Application ID</span>
+          <span class="value" id="pendingAppId">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fbo-content">
+      <div class="fbo-status-banner">
+        <div class="fbo-status-banner__icon">⏳</div>
+        <div class="fbo-status-banner__body">
+          <div class="fbo-status-banner__title">Your application is under review</div>
+          <div class="fbo-status-banner__sub">
+            FSSAI officials are reviewing your submitted documents and details.
+            Expected timeline: <strong>30 working days</strong>.
+            You'll receive an SMS and email notification once your license is approved.
+          </div>
+          <div class="fbo-status-banner__id" id="pendingAppIdBadge">—</div>
+
+          <!-- Timeline -->
+          <div class="fbo-timeline">
+            <div class="fbo-timeline__step done">
+              <div class="dot"></div>
+              <div class="step-label">Application<br>Submitted</div>
+            </div>
+            <div class="fbo-timeline__step active">
+              <div class="dot"></div>
+              <div class="step-label">Under<br>Review</div>
+            </div>
+            <div class="fbo-timeline__step">
+              <div class="dot"></div>
+              <div class="step-label">Document<br>Verification</div>
+            </div>
+            <div class="fbo-timeline__step">
+              <div class="dot"></div>
+              <div class="step-label">Inspection<br>(if required)</div>
+            </div>
+            <div class="fbo-timeline__step">
+              <div class="dot"></div>
+              <div class="step-label">License<br>Issued</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <button class="fbo-btn-primary" id="pendingTrackBtn">Track Application →</button>
+            <a href="/" class="fbo-btn-secondary">Back to Home</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Info summary -->
+      <p class="fbo-section-title">Your Application Summary</p>
+      <div class="fbo-license-panel" id="pendingSummaryPanel">
+        <div class="fbo-license-panel__grid">
+          <div>
+            <div class="fbo-license-field__label">Business Name</div>
+            <div class="fbo-license-field__value" id="pend-bizName">—</div>
+          </div>
+          <div>
+            <div class="fbo-license-field__label">License Type</div>
+            <div class="fbo-license-field__value" id="pend-licenseType">—</div>
+          </div>
+          <div>
+            <div class="fbo-license-field__label">Duration</div>
+            <div class="fbo-license-field__value" id="pend-duration">—</div>
+          </div>
+          <div>
+            <div class="fbo-license-field__label">Fee Paid</div>
+            <div class="fbo-license-field__value" id="pend-fee">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Approved state ── -->
+  <div id="fboApprovedView" style="display:none;">
+
+    <div class="fbo-header">
+      <div class="fbo-header__inner">
+        <div>
+          <div class="fbo-header__greeting" id="approvedGreeting">Welcome back 👋</div>
+          <div class="fbo-header__sub" id="approvedBusinessName">Your FSSAI license dashboard</div>
+        </div>
+        <div class="fbo-header__license-chip">
+          <span class="label">License Number</span>
+          <span class="value" id="approvedLicenseId">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fbo-content">
+
+      <!-- License details panel -->
+      <p class="fbo-section-title">License Details</p>
+      <div class="fbo-license-panel">
+        <div class="fbo-license-panel__grid">
+          <div>
+            <div class="fbo-license-field__label">License Type</div>
+            <div class="fbo-license-field__value" id="appr-licenseType">—</div>
+          </div>
+          <div>
+            <div class="fbo-license-field__label">Valid Until</div>
+            <div class="fbo-license-field__value" id="appr-validUntil">—</div>
+          </div>
+          <div>
+            <div class="fbo-license-field__label">Business Name</div>
+            <div class="fbo-license-field__value" id="appr-bizName">—</div>
+          </div>
+          <div>
+            <div class="fbo-license-field__label">Address</div>
+            <div class="fbo-license-field__value" id="appr-address">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions grid -->
+      <p class="fbo-section-title" style="margin-top:28px;">Quick Actions</p>
+      <div class="fbo-cards-grid">
+
+        <div class="fbo-card">
+          <div class="fbo-card__icon">📥</div>
+          <div class="fbo-card__title">Download License</div>
+          <div class="fbo-card__sub">Get your FSSAI license certificate as PDF</div>
+        </div>
+
+        <div class="fbo-card">
+          <div class="fbo-card__icon">🔄</div>
+          <div class="fbo-card__title">Renew License</div>
+          <div class="fbo-card__sub">Extend before your license expires</div>
+        </div>
+
+        <div class="fbo-card">
+          <div class="fbo-card__icon">✏️</div>
+          <div class="fbo-card__title">Update Details</div>
+          <div class="fbo-card__sub">Change address, contact, or business info</div>
+        </div>
+
+        <div class="fbo-card" onclick="window.location.href='/one-stop-shop'" style="cursor:pointer;">
+          <div class="fbo-card__icon">&#127978;</div>
+          <div class="fbo-card__title">One Stop Shop</div>
+          <div class="fbo-card__sub">Water testing, medical certs, safety kit &amp; hygiene subscriptions</div>
+        </div>
+
+        <div class="fbo-card">
+          <div class="fbo-card__icon">&#128203;</div>
+          <div class="fbo-card__title">Compliance Checklist</div>
+          <div class="fbo-card__sub">Stay audit-ready with our food safety guide</div>
+        </div>
+
+        <div class="fbo-card">
+          <div class="fbo-card__icon">🔔</div>
+          <div class="fbo-card__title">Notifications</div>
+          <div class="fbo-card__sub">Regulatory updates and renewal reminders</div>
+        </div>
+
+        <div class="fbo-card">
+          <div class="fbo-card__icon">📞</div>
+          <div class="fbo-card__title">Support</div>
+          <div class="fbo-card__sub">Reach FSSAI helpdesk or raise a complaint</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Loading state ── -->
+  <div id="fboLoadingView" style="display:flex;align-items:center;justify-content:center;min-height:60vh;">
+    <div style="text-align:center;color:var(--text-muted);">
+      <div style="font-size:28px;margin-bottom:12px;">⏳</div>
+      <div>Loading your portal…</div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/fbo_portal.js') }}"></script>
+{% endblock %}

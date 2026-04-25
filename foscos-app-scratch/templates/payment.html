@@ -1,0 +1,69 @@
+{% extends "_base.html" %}
+
+{% block title %}Payment — FOSCOS{% endblock %}
+{% block extra_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/registration.css') }}" />
+{% endblock %}
+
+{% block content %}
+<div class="payment-page">
+  <div class="payment-card">
+
+    <!-- Default view -->
+    <div id="paymentDefault">
+      <div class="payment-card__icon">🔒</div>
+      <div class="payment-card__title">Secure Payment</div>
+      <div class="payment-card__sub">Your application fee is collected securely through the FSSAI payment gateway.</div>
+
+      <div class="payment-section-label">License Fee</div>
+      <div id="paymentSummaryRows"></div>
+
+      <div id="paymentAddonsSection" style="display:none;">
+        <div class="payment-section-label payment-section-label--addon">One Stop Shop Add-ons</div>
+        <div id="paymentAddonRows"></div>
+      </div>
+
+      <div class="payment-total-row">
+        <span>Total</span>
+        <span id="payTotalAmount">&#8377; &mdash;</span>
+      </div>
+
+      <p class="reg-error" id="payError"></p>
+      <button class="reg-btn-cta" id="payNowBtn" style="width:100%;">Pay Now →</button>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:10px;">
+        Simulated payment — no real charge will be made.
+      </p>
+    </div>
+
+    <!-- Processing overlay -->
+    <div class="payment-processing" id="paymentProcessing">
+      <div class="payment-spinner"></div>
+      <div style="font-size:15px;font-weight:600;color:var(--navy);margin-bottom:20px;">Processing payment…</div>
+      <div class="payment-steps">
+        <div class="payment-step" id="pstep1">
+          <div class="pstep-dot"></div>
+          <span>Connecting to FSSAI Gateway</span>
+        </div>
+        <div class="payment-step" id="pstep2">
+          <div class="pstep-dot"></div>
+          <span>Verifying payment details</span>
+        </div>
+        <div class="payment-step" id="pstep3">
+          <div class="pstep-dot"></div>
+          <span>Generating application ID</span>
+        </div>
+        <div class="payment-step" id="pstep4">
+          <div class="pstep-dot"></div>
+          <span>Finalising submission</span>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:20px;">Please do not close this window.</div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/payment.js') }}"></script>
+{% endblock %}
